@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <title>Findrum</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/split.css">
+    <link rel="stylesheet" href="css/table.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/drummers.js"></script>
+</head>
+
+<body onload="load()">
+    <header>
+        <h1>Findrum drummers</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="drummers.html" class="navActive">Drummers</a>
+            <a href="bands.html">Bands</a>
+            <a href="components.html">Onderdelen</a>
+            <a href="brands.html">Merken</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="drummerCRUD">
+            <table>
+                <tr>
+                    <th></th>
+                    <th>Naam</th>
+                </tr>
+                <tbody id="indexDrummers" />
+            </table>
+            <div id="createForm">
+                <b>Toevoegen</b> <br>
+                <label>Voornaam:</label><input type="text" id="first_name" required /><br />
+                <label>Achternaam:</label><input type="text" id="last_name" required />
+                <button onclick="addDrummer()">Toevoegen</button>
+            </div>
+            <div id="updateForm">
+                <b>Wijziggen</b> <br>
+                <label>Voornaam:</label><input type="text" id="first_nameEdit" required /><br />
+                <label>Achternaam:</label><input type="text" id="last_nameEdit" required />
+                <button onclick="editDrummer()">Wijziggen</button>
+            </div>
+        </div>
+
+        <div id="line"></div>
+
+        <div id="componentCRUD">
+            <table>
+                <tr>
+                    <th>Naam</th>
+                    <th>Merk</th>
+                    <th>Diameter</th>
+                </tr>
+                <tbody id="indexComponents" />
+            </table>
+            <div id="createComponentForm">
+                <b>Toevoegen</b> <br>
+                <label>Naam:</label><input type="text" id="name" required /><br />
+                <label>Diameter:</label><input type="number" id="diameter" required /><br />
+                <label>Merk:</label><select id="brand_id" required></select>
+                <button onclick="addComponent()">Toevoegen</button>
+            </div>
+        </div>
+        <div id="loginContainer">
+            <b>Inloggen</b> <br>
+            <form action="javascript:void(0);">
+                <input type="email" placeholder="mail" id="mail" required>
+                <input type="password" placeholder="wachtwoord" id="wachtwoord" required>
+                <button type="submit" onclick="login()">Login</button>
+            </form>
+        </div>    
+    </main>
+    <footer>&copy; 2023 SDBR</footer>
+</body>
+
+</html>
