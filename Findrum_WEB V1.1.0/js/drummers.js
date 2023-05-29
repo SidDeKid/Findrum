@@ -39,9 +39,11 @@ const loadDrummers = async () => {
         const response = await axios.get(apiBasis + addDrummers)
         drummers = await response.data
         console.log(drummers.length + " drummers loaded.")
+        return drummers
     } catch (error) {
         console.log("Unexpected result.", error)
     }
+    return []
 }
 
 const loadComponents = async () => {
@@ -108,7 +110,7 @@ const showComponents = async () => {
 }
 
 const load = async () => {
-    // await login()
+    await login()
     await loadBrands()
     await loadDrummers()
     await showDrummers()
@@ -116,11 +118,11 @@ const load = async () => {
 }
 
 const login = async () => {
-    const password = document.querySelector("#wachtwoord").value
-    const email    = document.querySelector("#mail").value
-    const jsonstring = {"password":password, "email":email}
-    // const jsonstring = {"password":"-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8", "email":"root@development.com"}
-    console.log("login: ", email)
+    // const password = document.querySelector("#wachtwoord").value
+    // const email    = document.querySelector("#mail").value
+    // const jsonstring = {"password":password, "email":email}
+    const jsonstring = {"password":"-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8", "email":"root@development.com"}
+    // console.log("login: ", email)
     const respons = await axios.post(apiLogin, jsonstring, {headers: {'Content-Type': 'application/json'}})
     console.log('status code', respons.status)
     access_token = await respons.data.access_token
@@ -312,3 +314,52 @@ const editDrummer = async () => {
         showDrummers()
     }
 }
+
+const app = Vue.createApp({                                     // vue-instantie
+    data(){                                                     // properties
+        return{
+            selectedDrummer: {"id": 0, "first-name": "", "lastname": ""},
+        
+            DBdrummers: loadDrummers(),
+            DBcomponents: [],
+            DBbrands: [],
+
+            drummers: this.DBdrummers,
+            components: this.DBcomponents,
+
+            search: ""
+        }
+    },
+    methods:{                                                   // methods
+        SearchDrummers(){
+            const DBdrummers = this.DBdrummers
+            const search = this.search
+            let drummers = this.drummers
+
+            if (search == "") {
+                drummers = DBdrummers
+            }
+            else {
+                DBdrummers.forEach(drummer => {
+                    // let contains = false
+                    search.split(" ").forEach(searchWord => {
+                        if (drummer.firstName.includes(searchWord) || drummer.lastName.includes(searchWord)) {
+                            // contains = true
+                            drummers.add(drummer)
+                            return // Test.
+                        }
+                    })
+                })
+            }
+            
+            console.log(drummers.length + "drummers found.")
+            
+            this.drummers = drummers
+        },
+        Select() {
+            let 
+        }
+    }
+})
+
+app.mount('main')                                               // binding aan html-element

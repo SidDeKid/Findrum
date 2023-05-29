@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="css/form.css">
     <link rel="stylesheet" href="css/split.css">
     <link rel="stylesheet" href="css/table.css">
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="js/drummers.js"></script>
 </head>
 
 <body onload="load()">
@@ -26,18 +24,31 @@
     </header>
 
     <main>
+        <div id="loginContainer">
+            <b>Inloggen</b> <br>
+            <form action="javascript:void(0);">
+                <input type="email" placeholder="mail" id="mail" required>
+                <input type="password" placeholder="wachtwoord" id="wachtwoord" required>
+                <button type="submit" onclick="login()">Login</button>
+            </form>
+        </div>    
         <div id="drummerCRUD">
             <table>
                 <tr>
                     <th></th>
                     <th>Naam</th>
                 </tr>
-                <tbody id="indexDrummers" />
+                <tr v-for="drummer in drummers">
+                    <td class="selectButton" onclick="select(drummer, this)">Selecteer</td>
+                    <td>{{drummer.first_name}} {{drummer.last_name}}</td>
+                    <td onclick="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
+                </tr>
+                <!-- <tbody id="indexDrummers" /> -->
             </table>
             <div id="createForm">
                 <b>Toevoegen</b> <br>
-                <label>Voornaam:</label><input type="text" id="first_name" required /><br />
-                <label>Achternaam:</label><input type="text" id="last_name" required />
+                <label>Voornaam:</label><input v-model="addDrummerFirstName" type="text" id="first_name" /><br />
+                <label>Achternaam:</label><input v-model="addDrummerLastName" type="text" id="last_name" />
                 <button onclick="addDrummer()">Toevoegen</button>
             </div>
             <div id="updateForm">
@@ -67,16 +78,12 @@
                 <button onclick="addComponent()">Toevoegen</button>
             </div>
         </div>
-        <div id="loginContainer">
-            <b>Inloggen</b> <br>
-            <form action="javascript:void(0);">
-                <input type="email" placeholder="mail" id="mail" required>
-                <input type="password" placeholder="wachtwoord" id="wachtwoord" required>
-                <button type="submit" onclick="login()">Login</button>
-            </form>
-        </div>    
     </main>
     <footer>&copy; 2023 SDBR</footer>
 </body>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="js/drummers.js"></script>
 
 </html>
