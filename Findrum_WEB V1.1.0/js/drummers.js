@@ -8,11 +8,6 @@ const addBrand = "merk/"
 const apiLogin = apiBasis + "login"
 const apiRegister = apiBasis + "register"
 
-var drummers = []
-var components = []
-var brands = []
-var selectedDrummer = 0
-
 var loggedIn = false
 var access_token = undefined
 
