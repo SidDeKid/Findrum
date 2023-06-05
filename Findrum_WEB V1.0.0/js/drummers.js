@@ -8,6 +8,11 @@ const addBrand = "merk/"
 const apiLogin = apiBasis + "login"
 const apiRegister = apiBasis + "register"
 
+var drummers = []
+var components = []
+var brands = []
+var selectedDrummer = 0
+
 var loggedIn = false
 var access_token = undefined
 
@@ -34,11 +39,9 @@ const loadDrummers = async () => {
         const response = await axios.get(apiBasis + addDrummers)
         drummers = await response.data
         console.log(drummers.length + " drummers loaded.")
-        return drummers
     } catch (error) {
         console.log("Unexpected result.", error)
     }
-    return []
 }
 
 const loadComponents = async () => {
@@ -309,52 +312,3 @@ const editDrummer = async () => {
         showDrummers()
     }
 }
-
-const app = Vue.createApp({                                     // vue-instantie
-    data(){                                                     // properties
-        return{
-            selectedDrummer: {"id": 0, "first-name": "", "lastname": ""},
-        
-            DBdrummers: loadDrummers(),
-            DBcomponents: [],
-            DBbrands: [],
-
-            drummers: this.DBdrummers,
-            components: this.DBcomponents,
-
-            search: ""
-        }
-    },
-    methods:{                                                   // methods
-        SearchDrummers(){
-            const DBdrummers = this.DBdrummers
-            const search = this.search
-            let drummers = this.drummers
-
-            if (search == "") {
-                drummers = DBdrummers
-            }
-            else {
-                DBdrummers.forEach(drummer => {
-                    // let contains = false
-                    search.split(" ").forEach(searchWord => {
-                        if (drummer.firstName.includes(searchWord) || drummer.lastName.includes(searchWord)) {
-                            // contains = true
-                            drummers.add(drummer)
-                            return // Test.
-                        }
-                    })
-                })
-            }
-            
-            console.log(drummers.length + "drummers found.")
-            
-            this.drummers = drummers
-        },
-        Select() {
-            let 
-        }
-    }
-})
-
-app.mount('main')                                               // binding aan html-element

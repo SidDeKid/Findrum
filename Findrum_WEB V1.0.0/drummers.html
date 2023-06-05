@@ -9,11 +9,16 @@
     <link rel="stylesheet" href="css/form.css">
     <link rel="stylesheet" href="css/split.css">
     <link rel="stylesheet" href="css/table.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/drummers.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/Logo.png">
 </head>
 
 <body onload="load()">
     <header>
-        <h1><a href="index.html">Findrum</a></h1>
+        <a href="index.html">
+            <img src="assets/Logo.png" alt="Findrum">
+        </a>
         <nav>
             <a href="index.html">Home</a>
             <a href="drummers.html" class="navActive">Drummers</a>
@@ -26,35 +31,31 @@
     <main>
         <div id="loginContainer">
             <b>Inloggen</b> <br>
-            <form action="javascript:void(0);" v-bind:style="logInFormStyle">
-                <input v-model="user.email" type="email" placeholder="mail" id="mail">
-                <input v-model="user.password" type="password" placeholder="wachtwoord" id="wachtwoord">
-                <button type="submit" v-on:click="login()">Log in</button>
+            <form action="javascript:void(0);">
+                <input type="email" placeholder="mail" id="mail" required>
+                <input type="password" placeholder="wachtwoord" id="wachtwoord" required>
+                <button type="submit" onclick="login()">Login</button>
             </form>
-        </div>
+        </div>    
         <div id="drummerCRUD">
             <table>
                 <tr>
                     <th></th>
                     <th>Naam</th>
                 </tr>
-                <tr v-for="drummer in drummers">
-                    <td class="selectButton" onclick="select(drummer, this)">Selecteer</td>
-                    <td>{{drummer.first_name}} {{drummer.last_name}}</td>
-                    <td v-on:click="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
-                </tr>
+                <tbody id="indexDrummers" />
             </table>
-            <div id="createForm" v-bind:style="userFormStyle">
+            <div id="createForm">
                 <b>Toevoegen</b> <br>
-                <label>Voornaam:</label><input v-model="newDrummer.first_name" type="text" id="first_name" /><br />
-                <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name" />
-                <button v-on:click="addDrummer()">Toevoegen</button>
+                <label>Voornaam:</label><input type="text" id="first_name" /><br />
+                <label>Achternaam:</label><input type="text" id="last_name" />
+                <button onclick="addDrummer()">Toevoegen</button>
             </div>
-            <div id="updateForm" v-bind:style="userFormStyle">
+            <div id="updateForm">
                 <b>Wijziggen</b> <br>
-                <label>Voornaam:</label><input v-model="selectedDrummer.first_name" type="text" id="first_nameEdit" /><br />
-                <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit" />
-                <button v-on:click="editDrummer()">Wijziggen</button>
+                <label>Voornaam:</label><input type="text" id="first_nameEdit" /><br />
+                <label>Achternaam:</label><input type="text" id="last_nameEdit" />
+                <button onclick="editDrummer()">Wijziggen</button>
             </div>
         </div>
 
@@ -69,7 +70,7 @@
                 </tr>
                 <tbody id="indexComponents" />
             </table>
-            <div id="createComponentForm" v-bind:style="userFormStyle">
+            <div id="createComponentForm">
                 <b>Toevoegen</b> <br>
                 <label>Naam:</label><input type="text" id="name" required /><br />
                 <label>Diameter:</label><input type="number" id="diameter" required /><br />
@@ -80,9 +81,5 @@
     </main>
     <footer>&copy; 2023 SDBR</footer>
 </body>
-
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://unpkg.com/vue"></script>
-<script src="js/drummers.js"></script>
 
 </html>
