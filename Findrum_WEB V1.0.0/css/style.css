@@ -2,7 +2,7 @@ body {
     width: 95%;
     margin: auto;
     max-width: 1250px;
-    margin-top: 50px;
+    margin-top: 25px;
     background-color: bisque;
 }
 
@@ -11,16 +11,13 @@ header {
     justify-content: space-between;
     align-items: flex-end;
 }
-header h1 {
+header img {
     margin: 0;
+    width: 100px;
+    position: relative;
 }
-header h1 a {
-    color: black;
-    text-decoration: none;
-}
-header h1:hover {
+header img:hover {
     cursor: pointer;
-    text-decoration: underline;
 }
 nav {
     display: flex;
