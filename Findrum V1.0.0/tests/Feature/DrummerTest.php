@@ -4,12 +4,11 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class DrummerTest extends TestCase
 {
-    private $access_token = 0;
-
     /**
      * Can collect drummers out of the database.
      */
@@ -24,13 +23,10 @@ class DrummerTest extends TestCase
      */
     public function test_store(): void
     {
-        if ($access_token == 0) {
-            log_in();
-        }
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-            'Authorization' => "Bearer " + $access_token
-        ])->post('/api/drummers', ["first_name" => "Test", "second_name" => "Drummer"]);
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->post('/api/drummers', ["first_name" => "Test", "last_name" => "Drummer"]);
         $response->assertStatus(201);
     }
 
@@ -50,7 +46,7 @@ class DrummerTest extends TestCase
      */
     public function test_show(): void
     {
-        $response = $this->get('/api/drummers/1');
+        $response = $this->get('/api/drummers/'. DrummerTest::find_first());
         $response->assertStatus(200);
     }
 
@@ -59,13 +55,10 @@ class DrummerTest extends TestCase
      */
     public function test_edit()
     {
-        // if ($access_token == 0) {
-        //     log_in();
-        // }
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-            'Authorization' => "Bearer " + auth()->user()->createToken('API Token')->plainTextToken
-        ])->post('/api/drummers', ["first_name" => "Test", "second_name" => "Drummer"]);
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->patch('/api/drummers/'. DrummerTest::find_first(), ["first_name" => "Test", "last_name" => "Drummer"]);
         $response->assertStatus(200);
     }
 
@@ -76,7 +69,7 @@ class DrummerTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->post('/api/drummers', ["first_name" => "Test", "second_name" => "Drummer"]);
+        ])->patch('/api/drummers/'. DrummerTest::find_first(), ["first_name" => "Test", "second_name" => "Drummer"]);
         $response->assertStatus(500);
     }
         
@@ -85,13 +78,10 @@ class DrummerTest extends TestCase
     */
     public function test_delete(): void
     {
-        if ($access_token == 0) {
-            log_in();
-        }
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-            'Authorization' => "Bearer " + $access_token
-        ])->delete('/api/drummers/2');
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->delete('/api/drummers/'. DrummerTest::find_first());
         $response->assertStatus(200);
     }
         
@@ -102,16 +92,20 @@ class DrummerTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->delete('/api/drummers/2');
+        ])->delete('/api/drummers/'. DrummerTest::find_first());
         $response->assertStatus(500);
     }
 
-    public function log_in()
+    private function log_in()
     {
         $response = $this->withHeaders([
             'X-Header' => "Value",
         ])->post('/api/login', ['password' => '-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8', 'email' => 'root@development.com']);
-        dd($response);
-        return $response['headers']['data']['access_token'];
+        return $response->baseResponse->original['access_token'];
+    }
+
+    private function find_first() {
+        $response = $this->get('/api/drummers');
+        return $response->baseResponse->original[1]->id;
     }
 }
