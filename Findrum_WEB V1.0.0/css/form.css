@@ -4,6 +4,7 @@ label {
 }
 input, select {
     margin-top: 5px;
+    margin-right: 5px;
     width: 40%;
     padding: 2px;
 }

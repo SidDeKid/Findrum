@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/table.css">
 </head>
 
-<body onload="load()">
+<body>
     <header>
         <h1><a href="index.html">Findrum</a></h1>
         <nav>
@@ -39,7 +39,7 @@
                     <th>Naam</th>
                 </tr>
                 <tr v-for="drummer in drummers">
-                    <td class="selectButton" onclick="select(drummer, this)">Selecteer</td>
+                    <td class="selectButton" v-on:click="select(drummer, this)">Selecteer</td>
                     <td>{{drummer.first_name}} {{drummer.last_name}}</td>
                     <td v-on:click="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
                 </tr>
@@ -83,6 +83,6 @@
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
-<script src="js/drummers.js"></script>
+<script src="js/drummers.js"></script>    
 
 </html>

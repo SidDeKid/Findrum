@@ -16,12 +16,11 @@ const loadBrands = async () => {
     try {
         const response = await axios.get(apiBasis + addBrands)
         const json = await response.data
-        let selectBrand = ''
+        let brands
         json.map(el => {
             brands[el.id] = el.name
             selectBrand += `<option value="${el.id}">${el.name}</option>`
         })
-        document.getElementById("brand_id").innerHTML = selectBrand
         console.log(json.length + " brands loaded.")
     } catch (error) {
         console.log("Unexpected result.", error)
@@ -32,7 +31,7 @@ const loadDrummers = async () => {
     console.log('Loading drummers...')
     try {
         const response = await axios.get(apiBasis + addDrummers)
-        drummers = await response.data
+        const drummers = await response.data
         console.log(drummers.length + " drummers loaded.")
         return drummers
     } catch (error) {
@@ -104,32 +103,16 @@ const showComponents = async () => {
     document.getElementById("indexComponents").innerHTML = tabelInhoud
 }
 
-const load = async () => {
-    await login()
-    await loadBrands()
-    await loadDrummers()
-    await showDrummers()
-    showComponents()
-}
-
-const login = async () => {
-    // const password = document.querySelector("#wachtwoord").value
-    // const email    = document.querySelector("#mail").value
-    // const jsonstring = {"password":password, "email":email}
-    const jsonstring = {"password":"-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8", "email":"root@development.com"}
-    // console.log("login: ", email)
+const login = async (user) => {
+    const email    = user.email
+    const password = user.password
+    const jsonstring = {"password":password, "email":email}
+    console.log("login: ", email)
     const respons = await axios.post(apiLogin, jsonstring, {headers: {'Content-Type': 'application/json'}})
     console.log('status code', respons.status)
     access_token = await respons.data.access_token
     console.log('access_token: ', access_token)
     
-    document.querySelector("#loginContainer").style.display = "none"
-    document.querySelector("#createForm").style.display = "inline"
-    document.querySelectorAll("td:last-child").forEach(el => el.style.display = "inline")
-    if (selectedDrummer != 0) {
-        document.querySelector("#createComponentForm").style.display = "inline"
-    }
-
     loggedIn = true
 }		
 
@@ -314,19 +297,44 @@ const app = Vue.createApp({                                     // vue-instantie
     data(){                                                     // properties
         return{
             selectedDrummer: {"id": 0, "first-name": "", "lastname": ""},
+            newDrummer: {"id": 0, "first-name": "", "lastname": ""},
         
             DBdrummers: loadDrummers(),
-            DBcomponents: [],
-            DBbrands: [],
+            DBcomponents: loadComponents(),
+            DBbrands: loadBrands(),
 
             drummers: this.DBdrummers,
-            components: this.DBcomponents,
+            components: [],
 
-            search: ""
+            search: "",
+            user: {email: "root@development.com", password: "-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8"},
+
+            formStyle: {display: "none"},
+            loginFormStyle: {display: "inline"},
+            secondaryFormStyle: {display: "none"},
         }
     },
     methods:{                                                   // methods
-        SearchDrummers(){
+        loadDrummers() {
+            let DBdrummers = this.DBdrummers
+
+            DBdrummers = loadDrummers()
+
+            this.DBdrummers = DBdrummers
+
+            this.searchDrummers()
+        },
+
+        loadComponents() {
+            const DBcomponents = this.DBcomponents
+            let components = this.components
+
+            DBcomponents.forEach(component => {components.add(component)})
+
+            this.components = components
+        },
+        
+        searchDrummers(){
             const DBdrummers = this.DBdrummers
             const search = this.search
             let drummers = this.drummers
@@ -351,8 +359,56 @@ const app = Vue.createApp({                                     // vue-instantie
             
             this.drummers = drummers
         },
-        Select() {
-            let 
+
+        select(drummer, button) {
+            let selectedDrummer = this.selectedDrummer
+            let secondaryFormStyle = this.secondaryFormStyle
+
+            selectedDrummer = drummer
+            
+            document.querySelectorAll(".selectButton").forEach(selectButton => {
+                selectButton.className = "selectButton"
+            })
+            button.className += " selected"
+        
+            if (loggedIn) {
+                secondaryFormStyle = {display: "initial"}
+            }
+
+            this.selectedDrummer = selectedDrummer
+            this.secondaryFormStyle = secondaryFormStyle
+
+            this.loadComponents()
+        },
+
+        addDrummer() {
+            const newDrummer = this.newDrummer
+
+            addDrummer({"first_name": newDrummer.firstName, "last_name": newDrummer.lastName})
+        },
+
+        editDrummer() {
+            const selectedDrummer = this.selectedDrummer
+
+            editDrummer({"id": selectedDrummer.id, "first_name": selectedDrummer.firstName, "last_name": selectedDrummer.lastName})
+        },
+
+        login() {
+            const user = this.user
+            const selectedDrummer = this.selectedDrummer
+            let secondaryFormStyle = this.secondaryFormStyle
+            let loginFormStyle = this.loginFormStyle
+
+            login(user)
+            if(loggedIn) {
+                formStyle = {display: "inline"}
+                if (selectedDrummer.id != 0) {
+                    secondaryFormStyle = {display: "inline"}
+                }    
+            }
+
+            this.secondaryFormStyle = secondaryFormStyle
+            this.loginFormStyle = loginFormStyle
         }
     }
 })
