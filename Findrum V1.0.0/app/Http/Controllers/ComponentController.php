@@ -112,7 +112,6 @@ class ComponentController extends Controller
             'brand_id' => 'required|int',
             'name' => 'required|max:100',
             'diameter' => 'required|int',
-            'type' => 'required|max:10',
             'depth' => 'nullable|int',
         ]));
         return $component;
