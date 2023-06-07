@@ -25,7 +25,7 @@ class ComponentTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". ComponentTest::log_in()
-        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => ComponentTest::find_first_drummer(), "brand_id" => ComponentTest::find_first_brand()]);
+        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(201);
     }
 
@@ -36,7 +36,7 @@ class ComponentTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => ComponentTest::find_first_drummer(), "brand_id" => ComponentTest::find_first_brand()]);
+        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(500);
     }
 
@@ -45,7 +45,7 @@ class ComponentTest extends TestCase
      */
     public function test_show(): void
     {
-        $response = $this->get('/api/onderdelen/'. ComponentTest::find_first());
+        $response = $this->get('/api/onderdelen/'. ComponentTest::find_last());
         $response->assertStatus(200);
     }
 
@@ -57,7 +57,7 @@ class ComponentTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". ComponentTest::log_in()
-        ])->patch('/api/onderdelen/'. ComponentTest::find_first(), ["name" => "Test", "diameter" => 5, "drummer_id" => ComponentTest::find_first_drummer(), "brand_id" => ComponentTest::find_first_brand()]);
+        ])->patch('/api/onderdelen/'. ComponentTest::find_last(), ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(200);
     }
 
@@ -68,7 +68,7 @@ class ComponentTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->patch('/api/onderdelen/'. ComponentTest::find_first(), ["name" => "Test", "diameter" => 5, "drummer_id" => ComponentTest::find_first_drummer(), "brand_id" => ComponentTest::find_first_brand()]);
+        ])->patch('/api/onderdelen/'. ComponentTest::find_last(), ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(500);
     }
         
@@ -80,7 +80,7 @@ class ComponentTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". ComponentTest::log_in()
-        ])->delete('/api/onderdelen/'. ComponentTest::find_first());
+        ])->delete('/api/onderdelen/'. ComponentTest::find_last());
         $response->assertStatus(200);
     }
         
@@ -91,7 +91,7 @@ class ComponentTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->delete('/api/onderdelen/'. ComponentTest::find_first());
+        ])->delete('/api/onderdelen/'. ComponentTest::find_last());
         $response->assertStatus(500);
     }
 
@@ -103,18 +103,8 @@ class ComponentTest extends TestCase
         return $response->baseResponse->original['access_token'];
     }
 
-    private function find_first() {
+    private function find_last() {
         $response = $this->get('/api/onderdelen');
-        return $response->baseResponse->original[1]->id;
-    }
-
-    private function find_first_drummer() {
-        $response = $this->get('/api/drummers');
-        return $response->baseResponse->original[1]->id;
-    }
-
-    private function find_first_brand() {
-        $response = $this->get('/api/merken');
-        return $response->baseResponse->original[1]->id;
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
     }
 }

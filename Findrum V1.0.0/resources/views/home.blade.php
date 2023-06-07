@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Findrum API</title>
     <link rel="stylesheet" href="{{ URL('css/findrum.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ URL(img/Logo.png) }}">
+    <link rel="icon" type="image/x-icon" href="{{ URL('img/Logo.png') }}">
 </head>
 <body>
     <header>
