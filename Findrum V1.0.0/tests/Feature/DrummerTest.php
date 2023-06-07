@@ -46,7 +46,7 @@ class DrummerTest extends TestCase
      */
     public function test_show(): void
     {
-        $response = $this->get('/api/drummers/'. DrummerTest::find_first());
+        $response = $this->get('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(200);
     }
 
@@ -58,7 +58,7 @@ class DrummerTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". DrummerTest::log_in()
-        ])->patch('/api/drummers/'. DrummerTest::find_first(), ["first_name" => "Test", "last_name" => "Drummer"]);
+        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "last_name" => "Drummer"]);
         $response->assertStatus(200);
     }
 
@@ -69,7 +69,7 @@ class DrummerTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->patch('/api/drummers/'. DrummerTest::find_first(), ["first_name" => "Test", "second_name" => "Drummer"]);
+        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
         $response->assertStatus(500);
     }
         
@@ -81,7 +81,7 @@ class DrummerTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". DrummerTest::log_in()
-        ])->delete('/api/drummers/'. DrummerTest::find_first());
+        ])->delete('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(200);
     }
         
@@ -92,7 +92,7 @@ class DrummerTest extends TestCase
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->delete('/api/drummers/'. DrummerTest::find_first());
+        ])->delete('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(500);
     }
 
@@ -104,8 +104,8 @@ class DrummerTest extends TestCase
         return $response->baseResponse->original['access_token'];
     }
 
-    private function find_first() {
+    private function find_last() {
         $response = $this->get('/api/drummers');
-        return $response->baseResponse->original[1]->id;
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
     }
 }
