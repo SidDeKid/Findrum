@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('band_drummer', function (Blueprint $table) {
-            $table->foreignId('band_id')
+            $table->foreignId('drummer_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->foreignId('drummer_id')
+            $table->foreignId('band_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');

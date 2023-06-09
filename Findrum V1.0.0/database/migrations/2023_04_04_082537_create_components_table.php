@@ -11,23 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('components', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->foreignId('brand_id')
-        //         ->constrained()
-        //         ->onUpdate('cascade')
-        //         ->onDelete('cascade');
-        //     $table->string("name", 100);
-        //     $table->float("diameter", 4, 1); // In inches.
-        //     $table->timestamps();
-        // });
         Schema::create('components', function (Blueprint $table) {
             $table->id();
             $table->foreignId('brand_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreignId('drummer_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
@@ -35,6 +21,20 @@ return new class extends Migration
             $table->float("diameter", 4, 1); // In inches.
             $table->timestamps();
         });
+        // Schema::create('components', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('brand_id')
+        //         ->constrained()
+        //         ->onUpdate('cascade')
+        //         ->onDelete('cascade');
+        //     $table->foreignId('drummer_id')
+        //         ->constrained()
+        //         ->onUpdate('cascade')
+        //         ->onDelete('cascade');
+        //     $table->string("name", 100);
+        //     $table->float("diameter", 4, 1); // In inches.
+        //     $table->timestamps();
+        // });
     }
 
     /**

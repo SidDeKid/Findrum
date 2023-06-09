@@ -23,19 +23,27 @@ class Component_DrummerSeeder extends Seeder
         // ]);
         // DB::table('component_drummer')->insert([
         //     'component_id' => 3,
-        //     'drummer_id' => 1,
+        //     'drummer_id' => 2,
         // ]);
         // DB::table('component_drummer')->insert([
         //     'component_id' => 4,
-        //     'drummer_id' => 1,
+        //     'drummer_id' => 2,
         // ]);
         // DB::table('component_drummer')->insert([
         //     'component_id' => 5,
-        //     'drummer_id' => 1,
+        //     'drummer_id' => 3,
         // ]);
         // DB::table('component_drummer')->insert([
         //     'component_id' => 6,
-        //     'drummer_id' => 1,
+        //     'drummer_id' => 3,
+        // ]);
+        // DB::table('component_drummer')->insert([
+        //     'component_id' => 7,
+        //     'drummer_id' => 4,
+        // ]);
+        // DB::table('component_drummer')->insert([
+        //     'component_id' => 8,
+        //     'drummer_id' => 4,
         // ]);
     }
 }

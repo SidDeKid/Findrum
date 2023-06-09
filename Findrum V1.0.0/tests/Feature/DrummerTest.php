@@ -39,6 +39,11 @@ class DrummerTest extends TestCase
             'X-Header' => 'Value',
         ])->post('/api/drummers', ["first_name" => "Test", "second_name" => "Drummer"]);
         $response->assertStatus(500);
+        // $response = $this->withHeaders([
+        //     'X-Header' => 'Value',
+        //     'Authorization' => "Bearer 1|45"
+        // ])->post('/api/drummers', ["first_name" => "Test", "last_name" => "Drummer"]);
+        // $response->assertStatus(403);
     }
 
     /**
@@ -49,7 +54,23 @@ class DrummerTest extends TestCase
         $response = $this->get('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(200);
     }
-
+    
+    /** 
+     * Can edit an existing drummer in the database
+     */
+    public function test_edit_is_protected()
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
+        $response->assertStatus(500);
+        // $response = $this->withHeaders([
+        //     'X-Header' => 'Value',
+        //     'Authorization' => "Bearer 1|45"
+        // ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
+        // $response->assertStatus(403);
+    }
+    
     /** 
      * Can edit an existing drummer in the database
      */
@@ -61,18 +82,23 @@ class DrummerTest extends TestCase
         ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "last_name" => "Drummer"]);
         $response->assertStatus(200);
     }
-
-    /** 
-     * Can edit an existing drummer in the database
-     */
-    public function test_edit_is_protected()
+                
+    /**
+     * Can delete a drummer from the database.
+    */
+    public function test_delete_is_protected(): void
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
+        ])->delete('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(500);
+        // $response = $this->withHeaders([
+        //     'X-Header' => 'Value',
+        //     'Authorization' => "Bearer 1|45"
+        // ])->delete('/api/drummers/'. DrummerTest::find_last());
+        // $response->assertStatus(403);
     }
-        
+
     /**
      * Can delete a drummer from the database.
     */
@@ -83,17 +109,6 @@ class DrummerTest extends TestCase
             'Authorization' => "Bearer ". DrummerTest::log_in()
         ])->delete('/api/drummers/'. DrummerTest::find_last());
         $response->assertStatus(200);
-    }
-        
-    /**
-     * Can delete a drummer from the database.
-    */
-    public function test_delete_is_protected(): void
-    {
-        $response = $this->withHeaders([
-            'X-Header' => 'Value',
-        ])->delete('/api/drummers/'. DrummerTest::find_last());
-        $response->assertStatus(500);
     }
 
     private function log_in()

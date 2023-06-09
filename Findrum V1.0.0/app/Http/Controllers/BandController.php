@@ -28,7 +28,7 @@ class BandController extends Controller
             }
         }
 
-        return Band::all();
+        return Band::all()->load('drummers');
     }
 
     /**
@@ -46,7 +46,7 @@ class BandController extends Controller
      */
     public function show(Band $band)
     {
-        return $band;
+        return $band->load('drummers');
     }
 
     /**
@@ -73,7 +73,7 @@ class BandController extends Controller
         $band->update($request->validate([
             'name' => 'required|max:100',
         ]));
-        return $band;
+        return $band->load('drummers');
     }
 
     /**

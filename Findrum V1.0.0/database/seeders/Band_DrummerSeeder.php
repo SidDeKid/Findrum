@@ -13,21 +13,21 @@ class Band_DrummerSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('band_drummer')->insert([
-            'band_id' => 1,
-            'drummer_id' => 1,
-        ]);
-        DB::table('band_drummer')->insert([
-            'band_id' => 1,
-            'drummer_id' => 2,
-        ]);
-        DB::table('band_drummer')->insert([
-            'band_id' => 2,
-            'drummer_id' => 3,
-        ]);
-        DB::table('band_drummer')->insert([
-            'band_id' => 3,
-            'drummer_id' => 4,
-        ]);
+        // DB::table('band_drummer')->insert([
+        //     'band_id' => 1,
+        //     'drummer_id' => 1,
+        // ]);
+        // DB::table('band_drummer')->insert([
+        //     'band_id' => 1,
+        //     'drummer_id' => 2,
+        // ]);
+        // DB::table('band_drummer')->insert([
+        //     'band_id' => 2,
+        //     'drummer_id' => 3,
+        // ]);
+        // DB::table('band_drummer')->insert([
+        //     'band_id' => 3,
+        //     'drummer_id' => 4,
+        // ]);
     }
 }
