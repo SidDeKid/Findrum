@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Brand;
 
 class Component extends Model
 {
@@ -13,11 +14,11 @@ class Component extends Model
 
     public function drummers()
     {
-        // return $this->belongsToMany(Drummer::class);
-        return $this->hasOne(Drummer::class);
+        return $this->belongsToMany(Drummer::class);
     }
+
     public function brand()
     {
-        return $this->hasOne(Brand::class);
+        return $this->belongsTo(Brand::class);
     }
 }

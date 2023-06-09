@@ -28,7 +28,7 @@ class BrandController extends Controller
             }
         }
 
-        return Brand::all();
+        return Brand::all()->load('components');
     }
 
     /**
@@ -46,21 +46,21 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        return $brand;
+        return $brand->load('components');
     }
 
     /**
-     * Display the compartments related to the specified resource.
+     * Display the components related to the specified resource.
      */
-    public function compartments(Brand $brand)
+    public function components(Brand $brand)
     {
-        return $brand->compartments;
+        return $brand->components;
     }
     
     /**
-     * Remove an existing compartment from an existing brand.
+     * Remove an existing components from an existing brand.
      */
-    public function removeCompartment(Component $component, Brand $brand)
+    public function removeComponents(Component $component, Brand $brand)
     {
         return $brand->brand()->dissociate($brand);
     }
@@ -73,7 +73,7 @@ class BrandController extends Controller
         $brand->update($request->validate([
             'name' => 'required|max:100',
         ]));
-        return $brand;
+        return $brand->load('components');
     }
 
     /**

@@ -19,6 +19,6 @@ class Drummer extends Model
     public function components()
     {
         // return $this->belongsToMany(Component::class);
-        return $this->hasMany(Component::class);
+        return $this->belongsToMany(Component::class);
     }
 }

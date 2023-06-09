@@ -30,7 +30,8 @@ class DrummerController extends Controller
             }
         }
 
-        return Drummer::all();
+        // return Drummer::all()->load('bands')->load('components');
+        return Drummer::all()->load('bands')->load('components');
     }
 
     /**
@@ -49,7 +50,7 @@ class DrummerController extends Controller
      */
     public function show(Drummer $drummer)
     {
-        return $drummer;
+        return $drummer->load('bands')->load('components');
     }
 
     /**
@@ -65,10 +66,6 @@ class DrummerController extends Controller
      */
     public function addToBand(Drummer $drummer, Band $band)
     {
-        if (!is_null($drummer->band())) {
-            # code...
-        }
-        $band->drummers()->dissociate($drummer->band());
         return $band->drummers()->associate($drummer);
     }
 
@@ -85,7 +82,7 @@ class DrummerController extends Controller
      */
     public function components(Drummer $drummer)
     {
-        return $drummer->components;
+        return $drummer->components->load('brand');
     }
 
     /**
@@ -109,11 +106,10 @@ class DrummerController extends Controller
      */
     public function update(Request $request, Drummer $drummer)
     {
-        $drummer->update($request->validate([
+        return $drummer->update($request->validate([
             'first_name' => 'required|max:75',
             'last_name' => 'required|max:75',
         ]));
-        return $drummer;
     }
 
     /**

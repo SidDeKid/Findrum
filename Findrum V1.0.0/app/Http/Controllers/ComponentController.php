@@ -28,7 +28,7 @@ class ComponentController extends Controller
             }
         }
 
-        return Component::all();
+        return Component::all()->load('brand')->load('drummers');
     }
 
     /**
@@ -37,7 +37,6 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         return Component::create($request->validate([
-            'drummer_id' => 'required|int',
             'brand_id' => 'required|int',
             'name' => 'required|max:100',
             'diameter' => 'required|numeric',
@@ -49,7 +48,7 @@ class ComponentController extends Controller
      */
     public function show(Component $component)
     {
-        return $component;
+        return $component->load('brand')->load('drummers');
     }
     
     /**
@@ -84,13 +83,13 @@ class ComponentController extends Controller
      */
     public function drummers(Component $component)
     {
-        return $component->drummers;
+        return $component->drummers->load('band');
     }
     
     /**
      * Attach an existing drummer to an existing component.
      */
-    public function addComponent(Drummer $drummer, Component $component)
+    public function addDrummer(Drummer $drummer, Component $component)
     {
         return $component->drummers()->attach($drummer);
     }
@@ -98,7 +97,7 @@ class ComponentController extends Controller
     /**
      * Remove an existing drummer from an existing component.
      */
-    public function removeComponent(Drummer $drummer, Component $component)
+    public function removeDrummer(Drummer $drummer, Component $component)
     {
         return $component->drummers()->detach($drummer);
     }
@@ -108,13 +107,11 @@ class ComponentController extends Controller
      */
     public function update(Request $request, Component $component)
     {
-        $component->update($request->validate([
+        return $component->update($request->validate([
             'brand_id' => 'required|int',
             'name' => 'required|max:100',
             'diameter' => 'required|int',
-            'depth' => 'nullable|int',
         ]));
-        return $component;
     }
 
     /**

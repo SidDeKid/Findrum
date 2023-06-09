@@ -20,7 +20,7 @@ class AuthenticationController extends Controller {
                 'email' => $attr['email']
             ]);    
         } catch (\Throwable $th) {
-            Log::error("Error caught while trying to register new user." + $th);
+            Log::error("Error caught while trying to register new user.". $th);
             return response()->json(['message' => 'Registration unsuccessful'], 403);
         }
         return response()->json(['message' => 'Registration successful'], 200);
@@ -41,7 +41,7 @@ class AuthenticationController extends Controller {
                 'token_type' => 'Bearer'
             ];
         } catch (\Throwable $th) {
-            Log::error("Error caught while trying to log in user." + $th);
+            Log::error("Error caught while trying to log in user.". $th);
             return response()->json(['message' => 'Log in unsuccessful'], 403);
         }
         return response()->json($response, 200);
