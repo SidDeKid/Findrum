@@ -24,22 +24,6 @@ class DrummerController extends Controller
             }
         } 
         return Drummer::orderBy('last_name')->get()->load('bands')->load('components');
-
-        // if (isSet($_GET['name'])) {
-        //     $arrName = (explode(" ", $_GET['name']));
-
-        //     switch (sizeof($arrName)) {
-        //         case 0:
-        //             return Drummer::all();
-        //         case 1:
-        //             return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
-        //                 ->orWhere('last_name', $arrName[0])->get();
-        //         default:
-        //             return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
-        //                 ->orWhere('last_name', $arrName[0])
-        //                 ->orWhere('last_name', $arrName[1])->get();
-        //     }
-        // }
     }
 
     /**
@@ -84,7 +68,7 @@ class DrummerController extends Controller
     /**
      * Attach an existing drummer to an existing band.
      */
-    public function addBand(Drummer $drummer, Band $band)
+    public function addBand(Request $request, Drummer $drummer, Band $band)
     {
         $request->user()->currentAccessToken()->delete();
         $response = [
@@ -98,7 +82,7 @@ class DrummerController extends Controller
     /**
      * remove an existing drummer from an existing band.
      */
-    public function removeBand(Drummer $drummer, Band $band)
+    public function removeBand(Request $request, Drummer $drummer, Band $band)
     {
         $request->user()->currentAccessToken()->delete();
         $response = [
@@ -120,7 +104,7 @@ class DrummerController extends Controller
     /**
      * Attach an existing component to an existing drummer.
      */
-    public function addComponent(Drummer $drummer, Component $component)
+    public function addComponent(Request $request, Drummer $drummer, Component $component)
     {
         $request->user()->currentAccessToken()->delete();
         $response = [
@@ -134,7 +118,7 @@ class DrummerController extends Controller
     /**
      * Remove an existing component from an existing drummer.
      */
-    public function removeComponent(Drummer $drummer, Component $component)
+    public function removeComponent(Request $request, Drummer $drummer, Component $component)
     {
         $request->user()->currentAccessToken()->delete();
         $response = [
@@ -165,13 +149,13 @@ class DrummerController extends Controller
             'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
             'token_type'    => 'Bearer'
         ];
-        return response()->json($response, 201);
+        return response()->json($response, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Drummer $drummer)
+    public function destroy(Request $request, Drummer $drummer)
     {
         $request->user()->currentAccessToken()->delete();
         $response = [

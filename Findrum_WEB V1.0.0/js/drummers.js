@@ -59,12 +59,14 @@ const app = Vue.createApp({
             // Requirements for validation
             requirementsDrummer: {
                 "first_name_nullable":  false, "first_name_max_char":   75,
-                "last_name_nullable":   false, "last_name_max_char":    75
+                "last_name_nullable":   false, "last_name_max_char":    75,
+                "full_name_unique":     true,
             },
             requirementsComponent: {
-                "name_nullable":        false, "name_max_char": 100,
+                "name_nullable":        false, "name_max_char": 100, 
                 "diameter_nullable":    false,
-                "brand_id_nullable":    false
+                "brand_id_nullable":    false,
+                "fully_unique":         true,
             },
         
             // Database values
@@ -74,6 +76,9 @@ const app = Vue.createApp({
             // Visable values
             drummers: [],
             components: [],
+
+            // Error messages
+            errormessageCreateComponent: "",
 
             // Styles
             formStyle: {display: "none"},
@@ -158,7 +163,7 @@ const app = Vue.createApp({
          * @returns {void}
          */
         async addComponent() { // ------------------------------------- Link to drummer?
-            const accessToken = this.accessToken
+            let accessToken = this.accessToken
             let newComponent = this.newComponent
 
             try {
@@ -179,6 +184,7 @@ const app = Vue.createApp({
                         } 
                     })
                     if (response.status == 201) {
+                        accessToken = await response.data.access_token
                         console.log("Component added.", newComponent)
                         newComponent = {"name": "", "diameter": 0, "brand": undefined}
                     }
@@ -190,6 +196,7 @@ const app = Vue.createApp({
                 console.log("No component added, because of caught error.", error)
             } 
 
+            this.accessToken = accessToken
             this.newComponent = newComponent
             this.loadComponents()
         },
@@ -199,9 +206,10 @@ const app = Vue.createApp({
          * @returns {void}
          */
         async addDrummer() {
-            const accessToken = this.accessToken
+            let accessToken = this.accessToken
             let DBdrummers = this.DBdrummers
             let newDrummer = this.newDrummer
+            let errormessageCreateComponent = this.errormessageCreateComponent
 
             try {
                 if (this.validateDrummer(newDrummer)) {
@@ -217,25 +225,30 @@ const app = Vue.createApp({
                         } 
                     })
                     if (response.status == 201) {
+                        accessToken = await response.data.access_token
+
                         const newResponse = await axios.get(apiBasis + routeDrummers)
-                        newDrummer = await newResponse.data.pop()
+                        DBdrummers = await newResponse.data
 
-                        DBdrummers.push(newDrummer)
                         console.log(`Added drummer ${newDrummer.first_name} ${newDrummer.last_name}.`)
-
                         newDrummer = {"id": 0, "first_name": "", "last_name": ""}
                     }
                     else {
                         console.log('No drummer added, because of wrong status code: ', response.status)
+                        errormessageCreateComponent = "Couldn't add drummer for unknown reasons. Please refresh the page, and try again."
                     }
                 }
                 else {
                     console.log("No drummer added, because of bad data. (Missing / Unusable)")
+                    errormessageCreateComponent = "Please fill all the fields, and check if this drummer already exists."
                 }
             } catch (error) {
                 console.log("No drummer added, because of caught error.", error)
+                errormessageCreateComponent = "Couldn't add drummer for unknown reasons. Please refresh the page, and try again."
             }
 
+            this.errormessageCreateComponent = errormessageCreateComponent
+            this.accessToken = accessToken
             this.DBdrummers = DBdrummers
             this.newDrummer = newDrummer
             this.index()
@@ -247,7 +260,7 @@ const app = Vue.createApp({
          */
         async editDrummer() {
             const selectedDrummer = this.selectedDrummer
-            const accessToken = this.accessToken
+            let accessToken = this.accessToken
             let DBdrummers = this.DBdrummers
 
             try {
@@ -267,8 +280,11 @@ const app = Vue.createApp({
                         } 
                     })
                     if (response.status == 200) {
-                        const index = DBdrummers.findIndex(DBdrummer => DBdrummer.id == selectedDrummer.id);
-                        DBdrummers[index] = selectedDrummer;
+
+                        accessToken = await response.data.access_token
+                        const index = DBdrummers.findIndex(DBdrummer => DBdrummer.id == selectedDrummer.id)
+                        DBdrummers[index] = selectedDrummer
+
                         console.log("Updated drummer.", selectedDrummer)
                     }
                     else {
@@ -279,6 +295,7 @@ const app = Vue.createApp({
                 console.log("No drummer updated, because of caught error.", error)
             }         
 
+            this.accessToken = accessToken
             this.DBdrummers = DBdrummers
             this.index()
         },
@@ -289,7 +306,7 @@ const app = Vue.createApp({
          * @param {object} drummer 
          */
         async deleteDrummer(drummer) {
-            const accessToken = this.accessToken
+            let accessToken = this.accessToken
             let DBdrummers = this.DBdrummers
 
             try {
@@ -301,6 +318,7 @@ const app = Vue.createApp({
                     } 
                 })
                 if (response.status == 200) {
+                    accessToken = await response.data.access_token
                     DBdrummers = DBdrummers.filter(DBdrummer => DBdrummer !== drummer)
                     console.log("Deleted drummer.", drummer)        
                 }
@@ -311,7 +329,8 @@ const app = Vue.createApp({
                 console.log("No drummer deleted, because of caught error.", error) 
             }         
 
-            this.DBdrummers = DBdrummers   
+            this.DBdrummers = DBdrummers
+            this.accessToken = accessToken   
             this.deSelect()
             this.index()
         },
@@ -445,12 +464,24 @@ const app = Vue.createApp({
          */ 
         validateDrummer(drummer) {
             const requirements = this.requirementsDrummer
+            const DBdrummers = this.DBdrummers
+
+            let unique = true
+            if (requirements.full_name_unique) {
+                DBdrummers.forEach(DBdrummer => {
+                    if (DBdrummer.first_name.toLowerCase() == drummer.first_name.toLowerCase() && DBdrummer.last_name.toLowerCase() == drummer.last_name.toLowerCase()) {
+                        unique = false
+                        return
+                    }
+                })
+            }
 
             try {
                 return (requirements.first_name_nullable || (drummer.first_name != undefined && drummer.first_name != "" && drummer.first_name != null)) &&
                     drummer.first_name.length <= requirements.first_name_max_char &&
                     (requirements.last_name_nullable || (drummer.last_name != undefined && drummer.last_name != "" && drummer.last_name != null)) &&
-                    drummer.last_name.length <= requirements.last_name_max_char
+                    drummer.last_name.length <= requirements.last_name_max_char &&
+                    unique
                 } catch (error) {
                 console.log("Caught error while validating drummer.", error)
                 return false
@@ -467,14 +498,26 @@ const app = Vue.createApp({
         **/ 
         validateComponent(component) {
             const requirements = this.requirementsComponent
+            const DBcomponents = this.DBcomponents
+
+            let unique = true
+            if (requirements.fully_unique) {
+                DBcomponents.forEach(DBcomponent => {
+                    if (DBcomponent.name.toLowerCase() == component.name.toLowerCase() && DBcomponent.diameter == component.diameter && DBcomponent.brand_id == component.brand_id) {
+                        unique = false
+                        return
+                    }
+                })
+            }
 
             try {
                 return (requirements.name_nullable || (component.name != undefined && component.name != "" && component.name != null)) &&
                 component.name.length <= requirements.name_max_char &&
                 (requirements.diameter_nullable || (component.diameter != undefined && component.diameter != null && component.diameter != "" &&
                 !isNaN(component.diameter) && parseInt(Number(component.diameter)) == component.diameter && !isNaN(parseInt(component.diameter, 10)))) &&
-                (requirements.brand_id_nullable || (component.brand.id != undefined && component.brand.id != "" && component.brand.id != null &&
-                brand_id >= 1))
+                (requirements.brand_id_nullable || (component.brand.id != undefined && component.brand.id != "" && component.brand.id != null && 
+                component.brand.id >= 1 && !isNaN(component.brand.id) && parseInt(Number(component.brand.id)) == component.brand.id && !isNaN(parseInt(component.brand.id, 10)))) &&
+                unique
             } catch (error) {
                 console.log("Caught error while validating component.", error)
                 return false

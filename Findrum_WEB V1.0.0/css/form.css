@@ -12,3 +12,7 @@ input, select {
 #searchBar {
     margin-bottom: 15px;
 }
+
+.errorMessage {
+    color: red;
+}
