@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Drummer;
 use App\Models\Band;
 use App\Models\Component;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class DrummerController extends Controller
@@ -12,26 +14,32 @@ class DrummerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (isSet($_GET['name'])) {
-            $arrName = (explode(" ", $_GET['name']));
-
-            switch (sizeof($arrName)) {
-                case 0:
-                    return Drummer::all();
-                case 1:
-                    return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
-                        ->orWhere('last_name', $arrName[0])->get();
-                default:
-                    return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
-                        ->orWhere('last_name', $arrName[0])
-                        ->orWhere('last_name', $arrName[1])->get();
+        if ($request->has('sort')) {
+            try {
+                return Drummer::orderBy($request->sort)->orderby('last_name')->get()->load('bands')->load('components');
+            } catch (\Throwable $th) {
+                Log::error("While reading all drummers: ". $th);
             }
-        }
+        } 
+        return Drummer::orderBy('last_name')->get()->load('bands')->load('components');
 
-        // return Drummer::all()->load('bands')->load('components');
-        return Drummer::all()->load('bands')->load('components');
+        // if (isSet($_GET['name'])) {
+        //     $arrName = (explode(" ", $_GET['name']));
+
+        //     switch (sizeof($arrName)) {
+        //         case 0:
+        //             return Drummer::all();
+        //         case 1:
+        //             return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
+        //                 ->orWhere('last_name', $arrName[0])->get();
+        //         default:
+        //             return Drummer::where('first_name', 'like', "%". $arrName[0]. "%")
+        //                 ->orWhere('last_name', $arrName[0])
+        //                 ->orWhere('last_name', $arrName[1])->get();
+        //     }
+        // }
     }
 
     /**
@@ -39,10 +47,22 @@ class DrummerController extends Controller
      */
     public function store(Request $request)
     {
-        return Drummer::create($request->validate([
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required|max:75',
             'last_name' => 'required|max:75',
-        ]));
+        ]);
+        if ($validator->fails()) {
+            Log::error("New drummer not created, because of validator, request:". $request);
+            return response('{ "Errormessage": "Data not correct" }', 400)->header('Content-Type', 'application/json');
+        }
+
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => Drummer::create($request->all()),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 201);
     }
 
     /**
@@ -66,7 +86,13 @@ class DrummerController extends Controller
      */
     public function addBand(Drummer $drummer, Band $band)
     {
-        return $band->drummers()->attach($drummer);
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $band->drummers()->attach($drummer),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 201);
     }
 
     /**
@@ -74,7 +100,13 @@ class DrummerController extends Controller
      */
     public function removeBand(Drummer $drummer, Band $band)
     {
-        return $band->drummers()->detach($drummer);
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $band->drummers()->detach($drummer),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -90,7 +122,13 @@ class DrummerController extends Controller
      */
     public function addComponent(Drummer $drummer, Component $component)
     {
-        return $drummer->components()->attach($component);
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $drummer->components()->attach($component),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 201);
     }
 
     /**
@@ -98,7 +136,13 @@ class DrummerController extends Controller
      */
     public function removeComponent(Drummer $drummer, Component $component)
     {
-        return $drummer->components()->detach($component);
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $drummer->components()->detach($component),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -106,10 +150,22 @@ class DrummerController extends Controller
      */
     public function update(Request $request, Drummer $drummer)
     {
-        return $drummer->update($request->validate([
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required|max:75',
             'last_name' => 'required|max:75',
-        ]));
+        ]);
+        if ($validator->fails()) {
+            Log::error("New drummer not created, because of validator, request:". $request);
+            return response('{ "Errormessage": "Data not correct" }', 400)->header('Content-Type', 'application/json');
+        }
+
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $drummer->update($request->all()),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 201);
     }
 
     /**
@@ -117,6 +173,12 @@ class DrummerController extends Controller
      */
     public function destroy(Drummer $drummer)
     {
-        return $drummer->delete();
+        $request->user()->currentAccessToken()->delete();
+        $response = [
+            'data'          => $drummer->delete(),
+            'access_token'  => auth()->user()->createToken('API Token')->plainTextToken,
+            'token_type'    => 'Bearer'
+        ];
+        return response()->json($response, 200);
     }
 }

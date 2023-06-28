@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string("first_name", 75);
             $table->string("last_name", 75);
             $table->timestamps();
+            $table->unique(['first_name', 'last_name']);
         });
     }
 
