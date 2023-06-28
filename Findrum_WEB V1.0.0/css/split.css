@@ -1,6 +1,6 @@
 main {
     display: grid;
-    grid-template-columns: 1fr 50px 1fr;
+    grid-template-columns: 1fr 49px 1fr;
 }
 
 #line {
@@ -8,9 +8,9 @@ main {
     grid-row: 1/5;
     background-color: gray;
     width: 1px;
-    margin: 0 24.5px;
+    margin: 0 24px;
 }
-#secondaryCRUD {
+#secondary {
     grid-column: 3/4;
     display: grid;
     grid-template-rows: auto 1fr auto;

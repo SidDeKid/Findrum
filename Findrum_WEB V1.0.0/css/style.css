@@ -1,8 +1,10 @@
 body {
-    width: 95%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    width: 95vw;
     margin: auto;
     max-width: 1250px;
-    margin-top: 25px;
     background-color: bisque;
 }
 
@@ -10,6 +12,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    margin-top: 25px;
 }
 header img {
     margin: 0;
@@ -39,21 +42,30 @@ nav .navActive {
     text-decoration: underline;
 }
 
-div {
+main {
+    display: grid;
+    grid-template-rows: 1fr;
+}
+main div h2 {
+    margin-top: 0;
+}
+main div {
     width: 100%;
+    margin-top: 10px;
 }
 
-div, footer {
+footer {
     margin-top: 10px;
+    margin-bottom: 25px;
 }
 
 #createForm, #updateForm, #createComponentForm {
     display: none;
 }
-#primaryCRUD {
+#primary {
     grid-column: 1/2;
     display: grid;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: 40px 50px 1fr auto auto;
 }
 
 @media screen and (max-width: 931px) {

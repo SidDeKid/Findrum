@@ -84,10 +84,12 @@ const app = Vue.createApp({
             errormessageAddComponent:   "",
 
             // Styles
-            loginFormStyle:     {display: "inline"},
-            formStyle:          {display: "none"},
-            secondaryFormStyle: {display: "none"},
-            deleteButtonStyle:  {display: "none"},
+            loginFormStyle:             {display: "inline"},
+            formStyle:                  {display: "none"},
+            secondaryFormStyle:         {display: "none"},
+            deleteButtonStyle:          {display: "none"},
+            tableHeightStyle:           {maxHeight: "52vh"},
+            secondaryTableHeightStyle:  {maxHeight: "55vh"},
         }
     },
     methods:{
@@ -206,6 +208,7 @@ const app = Vue.createApp({
                 setTimeout(this.removeErrors, 5000)
             } 
 
+            this.errormessageAddComponent = errormessageAddComponent
             this.accessToken = accessToken
             this.newComponent = newComponent
             this.loadComponents()
@@ -369,6 +372,8 @@ const app = Vue.createApp({
             let secondaryFormStyle = this.secondaryFormStyle
             let loginFormStyle = this.loginFormStyle
             let deleteButtonStyle = this.deleteButtonStyle
+            let tableHeightStyle = this.tableHeightStyle
+            let secondaryTableHeightStyle = this.secondaryTableHeightStyle
 
             const jsonstring = {"password": user.password, "email": user.email}
         
@@ -379,11 +384,14 @@ const app = Vue.createApp({
                     accessToken = await response.data.access_token
                     console.log('Logged in. Access token: ', accessToken) 
 
-                    loginFormStyle = {display: "none"}
-                    formStyle = {display: "inline"}
-                    deleteButtonStyle = {display: "inline"}
+                    loginFormStyle =            {display: "none"}
+                    formStyle =                 {display: "inline"}
+                    deleteButtonStyle =         {display: "inline"}
+                    tableHeightStyle =          {maxHeight: "47vh"}
                     if (selectedDrummer.id != 0) {
-                        secondaryFormStyle = {display: "inline"}
+                        secondaryFormStyle =    {display: "inline"}
+                        tableHeightStyle =          {maxHeight: "35vh"}
+                        secondaryTableHeightStyle = {maxHeight: "47vh"}    
                     }
                 }
                 else {
@@ -403,6 +411,8 @@ const app = Vue.createApp({
             this.secondaryFormStyle = secondaryFormStyle
             this.loginFormStyle = loginFormStyle
             this.deleteButtonStyle = deleteButtonStyle
+            this.tableHeightStyle = tableHeightStyle
+            this.secondaryTableHeightStyle = secondaryTableHeightStyle
         }, 
 
         /**
@@ -448,15 +458,21 @@ const app = Vue.createApp({
             const accessToken = this.accessToken
             let selectedDrummer = this.selectedDrummer
             let secondaryFormStyle = this.secondaryFormStyle
+            let tableHeightStyle = this.tableHeightStyle
+            let secondaryTableHeightStyle = this.secondaryTableHeightStyle
 
             selectedDrummer = drummer
             
             if (accessToken != undefined) {
-                secondaryFormStyle = {display: "initial"}
+                secondaryFormStyle =        {display: "initial"}
+                tableHeightStyle =          {maxHeight: "35vh"}
+                secondaryTableHeightStyle = {maxHeight: "47vh"}
             }
 
             this.selectedDrummer = selectedDrummer
             this.secondaryFormStyle = secondaryFormStyle
+            this.tableHeightStyle = tableHeightStyle
+            this.secondaryTableHeightStyle = secondaryTableHeightStyle
             this.loadComponents()
         },
 
@@ -465,6 +481,7 @@ const app = Vue.createApp({
          * @returns {void}
          */
         deSelect() {
+            const accessToken = this.accessTokens
             let selectedDrummer = this.selectedDrummer
             let secondaryFormStyle = this.secondaryFormStyle
 
@@ -474,6 +491,10 @@ const app = Vue.createApp({
             })
 
             secondaryFormStyle = {display: "none"}
+            if (accessToken != undefined) {
+                tableHeightStyle =          {maxHeight: "47vh"}
+                secondaryTableHeightStyle = {maxHeight: "55vh"}
+            }
             
             this.secondaryFormStyle = secondaryFormStyle
             this.selectedDrummer = selectedDrummer

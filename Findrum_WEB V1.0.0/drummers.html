@@ -13,7 +13,9 @@
 
 <body>
     <header>
-        <h1><a href="index.html">Findrum</a></h1>
+        <a href="index.html">
+            <img src="assets/Logo.png" alt="Findrum">
+        </a>
         <nav>
             <a href="index.html">Home</a>
             <a href="drummers.html" class="navActive">Drummers</a>
@@ -24,24 +26,29 @@
     </header>
 
     <main>
-        <div id="primaryCRUD">
+        <div id="primary">
+            <h2>Drummers</h2>
             <input id="searchBar" v-model="strSearch" @input="index" type="text" placeholder="Zoeken...">
-            <table>
-                <tr>
-                    <th></th>
-                    <th>Naam</th>
-                </tr>
-                <tr v-for="drummer in drummers">
-                    <td class="selectButton" v-on:click="select(drummer)" onclick="select(this)">Selecteer</td>
-                    <td>{{drummer.first_name}} {{drummer.last_name}}</td>
-                    <td v-on:click="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
-                </tr>
-            </table>
+            <div class="tableContainer" v-bind:style="tableHeightStyle">
+                <table>
+                    <tr>
+                        <th></th>
+                        <th>Naam</th>
+                    </tr>
+                    <tr v-for="drummer in drummers">
+                        <td class="selectButton" v-on:click="select(drummer)" onclick="select(this)">Selecteer</td>
+                        <td>{{drummer.first_name}} {{drummer.last_name}}</td>
+                        <td v-on:click="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
+                    </tr>
+                </table>
+            </div>
             <div id="createForm" v-bind:style="formStyle">
                 <b>Toevoegen</b> <br>
                 <form action="javascript:void(0);">
-                    <label>Voornaam:</label><input v-model="newDrummer.first_name" type="text" id="first_name" placeholder="Harrie..." maxlength="75" required/> <br>
-                    <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name" placeholder="Drummer..." maxlength="75" required/>
+                    <label>Voornaam:</label><input v-model="newDrummer.first_name" type="text" id="first_name"
+                        placeholder="Harrie..." maxlength="75" required /> <br>
+                    <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name"
+                        placeholder="Drummer..." maxlength="75" required />
                     <button v-on:click="addDrummer">Toevoegen</button>
                 </form>
                 <div class="errorMessage">{{errormessageAddDrummer}}</div>
@@ -49,8 +56,10 @@
             <div id="updateForm" v-bind:style="secondaryFormStyle">
                 <b>Wijziggen</b> <br>
                 <form action="javascript:void(0);">
-                    <label>Voornaam:</label><input v-model="selectedDrummer.first_name" type="text" id="first_nameEdit" placeholder="Harrie..." maxlength="75" required/> <br>
-                    <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit" placeholder="Drummer..." maxlength="75" required/>
+                    <label>Voornaam:</label><input v-model="selectedDrummer.first_name" type="text" id="first_nameEdit"
+                        placeholder="Harrie..." maxlength="75" required /> <br>
+                    <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit"
+                        placeholder="Drummer..." maxlength="75" required />
                     <button v-on:click="editDrummer">Wijziggen</button>
                 </form>
                 <div class="errorMessage">{{errormessageEditDrummer}}</div>
@@ -63,34 +72,39 @@
                     <button type="submit" v-on:click="login">Log in</button>
                 </form>
                 <div class="errorMessage">{{errormessageLogIn}}</div>
-            </div>    
+            </div>
         </div>
 
         <div id="line"></div>
 
-        <div id="secondaryCRUD">
+        <div id="secondary">
             <div>
                 <strong>Geselecteerd</strong> <br>
-                <span v-html="selectedDrummer.first_name"></span>&nbsp;<span v-html="selectedDrummer.last_name"></span> <br> <br>
+                <span v-html="selectedDrummer.first_name"></span>&nbsp;<span v-html="selectedDrummer.last_name"></span>
+                <br> <br>
             </div>
-            <table>
-                <tr>
-                    <th>Naam</th>
-                    <th>Merk</th>
-                    <th>Diameter</th>
-                </tr>
-                <tr v-for="component in components">
-                    <td>{{component.name}}</td>
-                    <td>{{component.brand.name}}</td>
-                    <td>{{component.diameter}}</td>
-                    <td v-on:click="deleteComponent(component.id)" v-bind:style="deleteButtonStyle"> x </td>
-                </tr>
-            </table>
+            <div class="tableContainer" v-bind:style="secondaryTableHeightStyle">
+                <table>
+                    <tr>
+                        <th>Naam</th>
+                        <th>Merk</th>
+                        <th>Diameter</th>
+                    </tr>
+                    <tr v-for="component in components">
+                        <td>{{component.name}}</td>
+                        <td>{{component.brand.name}}</td>
+                        <td>{{component.diameter}}</td>
+                        <td v-on:click="deleteComponent(component.id)" v-bind:style="deleteButtonStyle"> x </td>
+                    </tr>
+                </table>
+            </div>
             <div id="createComponentForm" v-bind:style="secondaryFormStyle">
                 <b>Toevoegen</b> <br>
                 <form action="javascript:void(0);">
-                    <label>Naam:</label><input type="text" id="name" v-model="newComponent.name" placeholder="High-hat..." maxlength="100" required /><br />
-                    <label>Diameter:</label><input type="number" id="diameter" v-model="newComponent.diameter" required /><br />
+                    <label>Naam:</label><input type="text" id="name" v-model="newComponent.name"
+                        placeholder="High-hat..." maxlength="100" required /><br />
+                    <label>Diameter:</label><input type="number" id="diameter" v-model="newComponent.diameter"
+                        required /><br />
                     <label>Merk:</label><select id="brands" v-model="newComponent.brand" required>
                         <option v-for="brand in DBbrands" :value="brand">{{brand.name}}</option>
                     </select>
@@ -105,6 +119,6 @@
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
-<script src="js/drummers.js"></script>    
+<script src="js/drummers.js"></script>
 
 </html>

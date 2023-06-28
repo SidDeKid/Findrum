@@ -1,7 +1,12 @@
 table {
+    width: 100%;
     align-self: flex-start;
     border-collapse: collapse;
-    max-height: 500px;
+}
+main .tableContainer {
+    width: 100%;
+    max-height: 55vh; /* 40vh with create form */
+    overflow: auto;
 }
 th, td {
     text-align: left;
