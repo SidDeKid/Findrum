@@ -44,7 +44,7 @@
                     <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name" placeholder="Drummer..." maxlength="75" required/>
                     <button v-on:click="addDrummer">Toevoegen</button>
                 </form>
-                <div class="errorMessage">{{errormessageCreateComponent}}</div>
+                <div class="errorMessage">{{errormessageAddDrummer}}</div>
             </div>
             <div id="updateForm" v-bind:style="secondaryFormStyle">
                 <b>Wijziggen</b> <br>
@@ -53,7 +53,7 @@
                     <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit" placeholder="Drummer..." maxlength="75" required/>
                     <button v-on:click="editDrummer">Wijziggen</button>
                 </form>
-                <div class="errorMessage">{{errormessageCreateComponent}}</div>
+                <div class="errorMessage">{{errormessageEditDrummer}}</div>
             </div>
             <div id="loginContainer" v-bind:style="loginFormStyle">
                 <b>Inloggen</b> <br>
@@ -62,7 +62,7 @@
                     <input v-model="user.password" type="password" placeholder="wachtwoord" id="wachtwoord">
                     <button type="submit" v-on:click="login">Log in</button>
                 </form>
-                <div class="errorMessage">{{errormessageCreateComponent}}</div>
+                <div class="errorMessage">{{errormessageLogIn}}</div>
             </div>    
         </div>
 
@@ -95,7 +95,7 @@
                         <option v-for="brand in DBbrands" :value="brand">{{brand.name}}</option>
                     </select>
                     <button v-on:click="addComponent()">Toevoegen</button> <br>
-                    <div class="errorMessage">{{errormessageCreateComponent}}</div>
+                    <div class="errorMessage">{{errormessageAddComponent}}</div>
                 </form>
             </div>
         </div>

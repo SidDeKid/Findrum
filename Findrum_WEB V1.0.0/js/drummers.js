@@ -1,11 +1,11 @@
 "use strict"
 
-const apiBasis = "http://127.0.0.1:8000/api/"
-const routeDrummers = "drummers/"
+const apiBasis =        "http://127.0.0.1:8000/api/"
+const routeDrummers =   "drummers/"
 const routeComponents = "onderdelen/"
-const routeBrands = "merken/"
+const routeBrands =     "merken/"
 
-const apiLogin = apiBasis + "login"
+const apiLogin =    apiBasis + "login"
 const apiRegister = apiBasis + "register"
 
 const deleteComponent = async (id) => {
@@ -49,12 +49,12 @@ const app = Vue.createApp({
     data(){
         return{
             // Properties
-            user: {email: "root@development.com", password: "-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8"},
-            accessToken: undefined,
-            selectedDrummer: {"id": 0, "first_name": "", "last_name": ""},
-            newDrummer: {"id": 0, "first_name": "", "last_name": ""},
-            newComponent: {"name": "", "diameter": 0, "brand": undefined},
-            strSearch: "",
+            selectedDrummer:    {"id": 0, "first_name": "", "last_name": ""},
+            newDrummer:         {"id": 0, "first_name": "", "last_name": ""},
+            newComponent:       {"name": "", "diameter": 0, "brand": undefined},
+            user:               {"email": "root@development.com", "password": "-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8"},
+            accessToken:        undefined,
+            strSearch:          "",
 
             // Requirements for validation
             requirementsDrummer: {
@@ -71,20 +71,23 @@ const app = Vue.createApp({
         
             // Database values
             DBdrummers: [],
-            DBbrands: [],
+            DBbrands:   [],
 
             // Visable values
-            drummers: [],
+            drummers:   [],
             components: [],
 
             // Error messages
-            errormessageCreateComponent: "",
+            errormessageLogIn:          "",
+            errormessageAddDrummer:     "",
+            errormessageEditDrummer:    "",
+            errormessageAddComponent:   "",
 
             // Styles
-            formStyle: {display: "none"},
-            loginFormStyle: {display: "inline"},
+            loginFormStyle:     {display: "inline"},
+            formStyle:          {display: "none"},
             secondaryFormStyle: {display: "none"},
-            deleteButtonStyle: {display: "none"},
+            deleteButtonStyle:  {display: "none"},
         }
     },
     methods:{
@@ -163,14 +166,12 @@ const app = Vue.createApp({
          * @returns {void}
          */
         async addComponent() { // ------------------------------------- Link to drummer?
+            let errormessageAddComponent = this.errormessageAddComponent
             let accessToken = this.accessToken
             let newComponent = this.newComponent
 
             try {
                 if (this.validateComponent(newComponent)) {
-                    console.log("No component added, because of bad data. (Missing / Unusable)")
-                }
-                else {
                     const jsonstring = { 
                         "name": newComponent.name, 
                         "diameter": newComponent.diameter, 
@@ -190,10 +191,19 @@ const app = Vue.createApp({
                     }
                     else {
                         console.log('No component added, because of wrong status code.', response.status)
+                        errormessageAddComponent = "Het onderdeel kon niet toegevoegt worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                        setTimeout(this.removeErrors, 5000)
                     }
+                }
+                else {
+                    console.log("No component added, because of bad data. (Missing / Unusable)")
+                    errormessageAddComponent = "Vul alstublieft alle velden in en kijk of dit onderdeel al bestaat."
+                    setTimeout(this.removeErrors, 5000)
                 }
             } catch (error) {
                 console.log("No component added, because of caught error.", error)
+                errormessageAddComponent = "Het onderdeel kon niet toegevoegt worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                setTimeout(this.removeErrors, 5000)
             } 
 
             this.accessToken = accessToken
@@ -206,10 +216,10 @@ const app = Vue.createApp({
          * @returns {void}
          */
         async addDrummer() {
+            let errormessageAddDrummer = this.errormessageAddDrummer
             let accessToken = this.accessToken
             let DBdrummers = this.DBdrummers
             let newDrummer = this.newDrummer
-            let errormessageCreateComponent = this.errormessageCreateComponent
 
             try {
                 if (this.validateDrummer(newDrummer)) {
@@ -235,19 +245,22 @@ const app = Vue.createApp({
                     }
                     else {
                         console.log('No drummer added, because of wrong status code: ', response.status)
-                        errormessageCreateComponent = "Couldn't add drummer for unknown reasons. Please refresh the page, and try again."
+                        errormessageAddDrummer = "De drummer kon niet toegevoegt worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                        setTimeout(this.removeErrors, 5000)
                     }
                 }
                 else {
                     console.log("No drummer added, because of bad data. (Missing / Unusable)")
-                    errormessageCreateComponent = "Please fill all the fields, and check if this drummer already exists."
+                    errormessageAddDrummer = "Vul alstublieft alle velden in en kijk of deze drummer al bestaat."
+                    setTimeout(this.removeErrors, 5000)
                 }
             } catch (error) {
                 console.log("No drummer added, because of caught error.", error)
-                errormessageCreateComponent = "Couldn't add drummer for unknown reasons. Please refresh the page, and try again."
+                errormessageAddDrummer = "De drummer kon niet toegevoegt worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                setTimeout(this.removeErrors, 5000)
             }
 
-            this.errormessageCreateComponent = errormessageCreateComponent
+            this.errormessageAddDrummer = errormessageAddDrummer
             this.accessToken = accessToken
             this.DBdrummers = DBdrummers
             this.newDrummer = newDrummer
@@ -260,14 +273,12 @@ const app = Vue.createApp({
          */
         async editDrummer() {
             const selectedDrummer = this.selectedDrummer
+            let errormessageEditDrummer = this.errormessageEditDrummer
             let accessToken = this.accessToken
             let DBdrummers = this.DBdrummers
 
             try {
-                if (!this.validateDrummer(selectedDrummer)) {
-                    console.log("No drummer updated, because of bad data. (Missing / Unusable)")
-                }
-                else {
+                if (this.validateDrummer(selectedDrummer)) {
                     const jsonstring = { 
                         "first_name": selectedDrummer.first_name, 
                         "last_name": selectedDrummer.last_name 
@@ -280,7 +291,6 @@ const app = Vue.createApp({
                         } 
                     })
                     if (response.status == 200) {
-
                         accessToken = await response.data.access_token
                         const index = DBdrummers.findIndex(DBdrummer => DBdrummer.id == selectedDrummer.id)
                         DBdrummers[index] = selectedDrummer
@@ -289,12 +299,22 @@ const app = Vue.createApp({
                     }
                     else {
                         console.log('No drummer updated, because of wrong status code.', response.status)
+                        errormessageLogIn = "De drummer kon niet aangepast worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                        setTimeout(this.removeErrors, 5000)
                     }
+                }
+                else {
+                    console.log("No drummer updated, because of bad data. (Missing / Unusable)")
+                    errormessageEditDrummer = "Vul alstublieft alle velden in en kijk of deze drummer al bestaat."
+                    setTimeout(this.removeErrors, 5000)
                 }
             } catch (error) {
                 console.log("No drummer updated, because of caught error.", error)
+                errormessageEditDrummer = "De drummer kon niet aangepast worden. Vernieuw alstublieft de pagina en probeer het opnieuw."
+                setTimeout(this.removeErrors, 5000)
             }         
 
+            this.errormessageEditDrummer = errormessageEditDrummer
             this.accessToken = accessToken
             this.DBdrummers = DBdrummers
             this.index()
@@ -343,6 +363,7 @@ const app = Vue.createApp({
         async login() {
             const user = this.user
             const selectedDrummer = this.selectedDrummer
+            let errormessageLogIn = this.errormessageLogIn
             let accessToken = this.accessToken
             let formStyle = this.formStyle
             let secondaryFormStyle = this.secondaryFormStyle
@@ -367,11 +388,16 @@ const app = Vue.createApp({
                 }
                 else {
                     console.log("Unable to log in, because of wrong status code.", response.status)
+                    errormessageLogIn = "Kon niet inloggen."
+                    setTimeout(this.removeErrors, 5000)
                 }
             } catch (error) {
                 console.log("Unable to log in, because of caught error.", error)
+                errormessageLogIn = "Kon niet inloggen"
+                setTimeout(this.removeErrors, 5000)
             }
 
+            this.errormessageLogIn = errormessageLogIn
             this.accessToken = accessToken
             this.formStyle = formStyle
             this.secondaryFormStyle = secondaryFormStyle
@@ -459,7 +485,7 @@ const app = Vue.createApp({
          * Returns:
          * - true, if data is usable.
          * - false, if data is unusable. 
-         * @return {boolean}
+         * @returns {boolean}
          * @param {object} drummer 
          */ 
         validateDrummer(drummer) {
@@ -522,7 +548,28 @@ const app = Vue.createApp({
                 console.log("Caught error while validating component.", error)
                 return false
             }
-        }
+        },
+
+        /**
+         * Remove all error messages.
+         * @returns {void}
+         */
+        removeErrors() {
+            let errormessageLogIn = this.errormessageLogIn
+            let errormessageAddDrummer = this.errormessageAddDrummer
+            let errormessageEditDrummer = this.errormessageEditDrummer
+            let errormessageAddComponent = this.errormessageAddComponent
+
+            errormessageLogIn = ""
+            errormessageAddDrummer = ""
+            errormessageEditDrummer = ""
+            errormessageAddComponent = ""
+
+            this.errormessageLogIn = errormessageLogIn
+            this.errormessageAddDrummer = errormessageAddDrummer
+            this.errormessageEditDrummer = errormessageEditDrummer
+            this.errormessageAddComponent = errormessageAddComponent
+        },
     },
     created: function() {
         this.load()
