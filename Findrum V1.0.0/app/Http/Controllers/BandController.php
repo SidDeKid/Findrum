@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Band;
+use App\Models\Drummer;
 use Illuminate\Http\Request;
 
 class BandController extends Controller
@@ -60,9 +61,17 @@ class BandController extends Controller
     /**
      * remove an existing drummer from an existing band.
      */
-    public function removeDrummer(Drummer $drummer, Band $band)
+    public function addDrummer(Band $band, Drummer $drummer)
     {
-        return $band->drummers()->dissociate($drummer);
+        return $band->drummers()->attach($drummer);
+    }
+
+    /**
+     * remove an existing drummer from an existing band.
+     */
+    public function removeDrummer(Band $band, Drummer $drummer)
+    {
+        return $band->drummers()->detach($drummer);
     }
 
     /**

@@ -25,19 +25,44 @@ class ComponentTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". ComponentTest::log_in()
-        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
+        ])->post('/api/onderdelen', ["name" => "TEST", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(201);
     }
 
     /**
-     * The store function is protected.
+     * Can store a drummer in the database.
      */
-    public function test_store_is_protected(): void
+    public function test_store_drummer(): void
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->post('/api/onderdelen', ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
-        $response->assertStatus(500);
+            'Authorization' => "Bearer ". ComponentTest::log_in()
+        ])->post('/api/onderdelen/'. ComponentTest::find_last(). '/drummers/'. ComponentTest::find_last_drummer());
+        $response->assertStatus(200);
+    }
+    
+    /**
+     * Can store a drummer in the database.
+     */
+    public function test_delete_drummer(): void
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+            'Authorization' => "Bearer ". ComponentTest::log_in()
+        ])->delete('/api/onderdelen/'. ComponentTest::find_last(). '/drummers/'. ComponentTest::find_last_drummer());
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Can store a drummer in the database.
+     */
+    public function test_add_to_brand(): void
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+            'Authorization' => "Bearer ". ComponentTest::log_in()
+        ])->post('/api/onderdelen/'. ComponentTest::find_last(). '/merken/'. ComponentTest::find_last_brand());
+        $response->assertStatus(200);
     }
 
     /**
@@ -57,19 +82,8 @@ class ComponentTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". ComponentTest::log_in()
-        ])->patch('/api/onderdelen/'. ComponentTest::find_last(), ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
+        ])->patch('/api/onderdelen/'. ComponentTest::find_last(), ["name" => "TEST", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
         $response->assertStatus(200);
-    }
-
-    /** 
-     * Can edit an existing drummer in the database
-     */
-    public function test_edit_is_protected()
-    {
-        $response = $this->withHeaders([
-            'X-Header' => 'Value',
-        ])->patch('/api/onderdelen/'. ComponentTest::find_last(), ["name" => "Test", "diameter" => 5, "drummer_id" => 1, "brand_id" => 1]);
-        $response->assertStatus(500);
     }
         
     /**
@@ -83,19 +97,8 @@ class ComponentTest extends TestCase
         ])->delete('/api/onderdelen/'. ComponentTest::find_last());
         $response->assertStatus(200);
     }
-        
-    /**
-     * Can delete a drummer from the database.
-    */
-    public function test_delete_is_protected(): void
-    {
-        $response = $this->withHeaders([
-            'X-Header' => 'Value',
-        ])->delete('/api/onderdelen/'. ComponentTest::find_last());
-        $response->assertStatus(500);
-    }
 
-    private function log_in()
+    private function log_in() : string
     {
         $response = $this->withHeaders([
             'X-Header' => "Value",
@@ -103,8 +106,21 @@ class ComponentTest extends TestCase
         return $response->baseResponse->original['access_token'];
     }
 
-    private function find_last() {
+    public function find_last() : int 
+    {
         $response = $this->get('/api/onderdelen');
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
+    }
+
+    public function find_last_drummer() : int 
+    {
+        $response = $this->get('/api/drummers');
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
+    }
+
+    public function find_last_brand() : int 
+    {
+        $response = $this->get('/api/merken');
         return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
     }
 }

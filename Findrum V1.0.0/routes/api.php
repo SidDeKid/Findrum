@@ -27,34 +27,34 @@ Route::get('merken/{brand}/onderdelen', [BrandController::class, 'components'])-
 
 Route::ApiResource('onderdelen', ComponentController::class)->parameters(['onderdelen' => 'component'])->only("index", "show");
 Route::get('onderdelen/{component}/drummers', [ComponentController::class, 'drummers'])->name('component.drummers');
-Route::get('onderdelen/{component}/merk', [ComponentController::class, 'brand'])->name('component.brand');
+Route::get('onderdelen/{component}/merken', [ComponentController::class, 'brand'])->name('component.brands');
 
 Route::ApiResource('drummers', DrummerController::class)->only("index", "show");
 Route::get('drummers/{drummer}/bands', [DrummerController::class, 'bands'])->name('drummers.bands');
 Route::get('drummers/{drummer}/onderdelen', [DrummerController::class, 'components'])->name('drummers.components');
 
-Route::post('/register', [AuthenticationController::class, 'register']);
 Route::post('/login', [AuthenticationController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::ApiResource('bands', BandController::class)->except("index", "show");
-    Route::delete('bands/{band}/drummers/{drummer}', [BandController::class, 'removeDrummer'])->name('bands.removeDrummers');
+    Route::post('bands/{band}/drummers/{drummer}', [BandController::class, 'addDrummer'])->name('bands.addDrummer');
+    Route::delete('bands/{band}/drummers/{drummer}', [BandController::class, 'removeDrummer'])->name('bands.removeDrummer');
     
     Route::ApiResource('merken', BrandController::class)->parameters(['merken' => 'brand'])->except("index", "show");
-    Route::delete('merken/{brand}/onderdelen/{compartment}', [BrandController::class, 'removeComponent'])->name('brand.removeComponent');
         
     Route::ApiResource('onderdelen', ComponentController::class)->parameters(['onderdelen' => 'component'])->except("index", "show");
-    Route::post('onderdelen/{component}/merk/{brand}', [ComponentController::class, 'addToBrand'])->name('component.addToBrand');
-    Route::delete('onderdelen/{component}/merk/{brand}', [ComponentController::class, 'removeFromBrand'])->name('component.removeFromBrand');
+    Route::post('onderdelen/{component}/merken/{brand}', [ComponentController::class, 'addToBrand'])->name('component.addToBrand');
     Route::post('onderdelen/{component}/drummers/{drummer}', [ComponentController::class, 'addDrummer'])->name('component.addDrummer');
     Route::delete('onderdelen/{component}/drummers/{drummer}', [ComponentController::class, 'removeDrummer'])->name('component.removeDrummer');
 
     Route::ApiResource('drummers', DrummerController::class)->except("index", "show");
-    Route::post('drummers/{drummer}/bands/{band}', [DrummerController::class, 'addToBand'])->name('drummers.addToBand');
-    Route::delete('drummers/{drummer}/bands/{band}', [DrummerController::class, 'removeFromBand'])->name('drummers.removeFromBand');
-    Route::post('drummers/{drummer}/onderdelen/{compartment}', [DrummerController::class, 'addComponent'])->name('drummers.addComponent');
-    Route::delete('drummers/{drummer}/onderdelen/{compartment}', [DrummerController::class, 'removeComponent'])->name('drummers.removeComponent');
+    Route::post('drummers/{drummer}/bands/{band}', [DrummerController::class, 'addBand'])->name('drummers.addBand');
+    Route::delete('drummers/{drummer}/bands/{band}', [DrummerController::class, 'removeBand'])->name('drummers.removeBand');
+    Route::post('drummers/{drummer}/onderdelen/{component}', [DrummerController::class, 'addComponent'])->name('drummers.addComponent');
+    Route::delete('drummers/{drummer}/onderdelen/{component}', [DrummerController::class, 'removeComponent'])->name('drummers.removeComponent');
 
+    Route::post('register', [AuthenticationController::class, 'register']);
     Route::get('profile', function(Request $request) { return auth()->user(); });
-    Route::post('/logout', [AuthenticationController::class, 'logout']);
+    Route::post('logout', [AuthenticationController::class, 'logout']);
+    Route::delete('/profile', [AuthenticationController::class, 'destroy']);
 });

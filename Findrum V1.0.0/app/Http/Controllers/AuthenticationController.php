@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 
 class AuthenticationController extends Controller {
+    /*
+     * Create a user in the database.
+    */
     public function register(Request $request) {
         try {
             $attr = $request->validate([
@@ -21,11 +24,14 @@ class AuthenticationController extends Controller {
             ]);    
         } catch (\Throwable $th) {
             Log::error("Error caught while trying to register new user.". $th);
-            return response()->json(['message' => 'Registration unsuccessful'], 403);
+            return response()->json(['message' => 'Registration unsuccessful'], 405);
         }
         return response()->json(['message' => 'Registration successful'], 200);
     }
-    
+
+    /*
+     * Get personal access token.
+    */
     public function login(Request $request) {
         try {
             $attr = $request->validate([
@@ -47,8 +53,24 @@ class AuthenticationController extends Controller {
         return response()->json($response, 200);
     }
 
+    /*
+     * Deactivate personal access token.
+    */
     public function logout() {
         auth()->user()->tokens()->delete();
         return response()->json(['message' => 'Tokens Revoked'], 200);
+    }
+    
+    /*
+     * Delete self, unless there is only one user left.
+    */
+    public function destroy() {
+        $users = User::all();
+        
+        if (count($users)) {
+            auth()->user()->delete();
+            return response()->json(['message' => 'Account deleted'], 200);
+        }
+        return response()->json(['message' => "Can't delete last remaning user."], 403);
     }
 }

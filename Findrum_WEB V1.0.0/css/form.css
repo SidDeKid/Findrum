@@ -8,3 +8,7 @@ input, select {
     width: 40%;
     padding: 2px;
 }
+
+#searchBar {
+    margin-bottom: 15px;
+}

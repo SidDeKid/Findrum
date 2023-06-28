@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Component;
+use App\Models\Drummer;
 use Illuminate\Http\Request;
 
 class ComponentController extends Controller
@@ -64,18 +66,8 @@ class ComponentController extends Controller
      */
     public function addToBrand(Component $component, Brand $brand)
     {
-        if (!is_null($drummer->brand())) {
-            $component->brand()->dissociate($drummer->brand());
-        }
-        return $component->brand()->associate($drummer);
-    }
-    
-    /**
-     * Remove an existing drummer from an existing brand.
-     */
-    public function removeFromBrand(Component $component, Brand $brand)
-    {
-        return $component->brand()->dissociate($brand);
+        $component->brand()->dissociate($component->brand());
+        return $component->brand()->associate($brand);
     }
 
     /**
@@ -89,7 +81,7 @@ class ComponentController extends Controller
     /**
      * Attach an existing drummer to an existing component.
      */
-    public function addDrummer(Drummer $drummer, Component $component)
+    public function addDrummer(Component $component, Drummer $drummer)
     {
         return $component->drummers()->attach($drummer);
     }
@@ -97,7 +89,7 @@ class ComponentController extends Controller
     /**
      * Remove an existing drummer from an existing component.
      */
-    public function removeDrummer(Drummer $drummer, Component $component)
+    public function removeDrummer(Component $component, Drummer $drummer)
     {
         return $component->drummers()->detach($drummer);
     }

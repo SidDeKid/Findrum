@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class DrummerTest extends TestCase
@@ -26,24 +25,56 @@ class DrummerTest extends TestCase
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". DrummerTest::log_in()
-        ])->post('/api/drummers', ["first_name" => "Test", "last_name" => "Drummer"]);
+        ])->post('/api/drummers', ["first_name" => "TEST", "last_name" => "DRUMMER"]);
         $response->assertStatus(201);
     }
 
     /**
-     * The store function is protected.
+     * Can store a drummer in the database.
      */
-    public function test_store_is_protected(): void
+    public function test_store_component(): void
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
-        ])->post('/api/drummers', ["first_name" => "Test", "second_name" => "Drummer"]);
-        $response->assertStatus(500);
-        // $response = $this->withHeaders([
-        //     'X-Header' => 'Value',
-        //     'Authorization' => "Bearer 1|45"
-        // ])->post('/api/drummers', ["first_name" => "Test", "last_name" => "Drummer"]);
-        // $response->assertStatus(403);
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->post('/api/drummers/'. DrummerTest::find_last(). '/onderdelen/'. DrummerTest::find_last_component());
+        $response->assertStatus(200);
+    }
+    
+    /**
+     * Can store a drummer in the database.
+     */
+    public function test_delete_component(): void
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->delete('/api/drummers/'. DrummerTest::find_last(). '/onderdelen/'. DrummerTest::find_last_component());
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Can store a drummer in the database.
+     */
+    public function test_store_band(): void
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->post('/api/drummers/'. DrummerTest::find_last(). '/bands/'. DrummerTest::find_last_band());
+        $response->assertStatus(200);
+    }
+    
+    /**
+     * Can store a drummer in the database.
+     */
+    public function test_delete_band(): void
+    {
+        $response = $this->withHeaders([
+            'X-Header' => 'Value',
+            'Authorization' => "Bearer ". DrummerTest::log_in()
+        ])->delete('/api/drummers/'. DrummerTest::find_last(). '/bands/'. DrummerTest::find_last_band());
+        $response->assertStatus(200);
     }
 
     /**
@@ -58,45 +89,13 @@ class DrummerTest extends TestCase
     /** 
      * Can edit an existing drummer in the database
      */
-    public function test_edit_is_protected()
-    {
-        $response = $this->withHeaders([
-            'X-Header' => 'Value',
-        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
-        $response->assertStatus(500);
-        // $response = $this->withHeaders([
-        //     'X-Header' => 'Value',
-        //     'Authorization' => "Bearer 1|45"
-        // ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "second_name" => "Drummer"]);
-        // $response->assertStatus(403);
-    }
-    
-    /** 
-     * Can edit an existing drummer in the database
-     */
     public function test_edit()
     {
         $response = $this->withHeaders([
             'X-Header' => 'Value',
             'Authorization' => "Bearer ". DrummerTest::log_in()
-        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "Test", "last_name" => "Drummer"]);
+        ])->patch('/api/drummers/'. DrummerTest::find_last(), ["first_name" => "TEST", "last_name" => "DRUMMER"]);
         $response->assertStatus(200);
-    }
-                
-    /**
-     * Can delete a drummer from the database.
-    */
-    public function test_delete_is_protected(): void
-    {
-        $response = $this->withHeaders([
-            'X-Header' => 'Value',
-        ])->delete('/api/drummers/'. DrummerTest::find_last());
-        $response->assertStatus(500);
-        // $response = $this->withHeaders([
-        //     'X-Header' => 'Value',
-        //     'Authorization' => "Bearer 1|45"
-        // ])->delete('/api/drummers/'. DrummerTest::find_last());
-        // $response->assertStatus(403);
     }
 
     /**
@@ -111,7 +110,10 @@ class DrummerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    private function log_in()
+    /*
+     * Return a personal access token.
+    */
+    private function log_in() : string
     {
         $response = $this->withHeaders([
             'X-Header' => "Value",
@@ -119,8 +121,30 @@ class DrummerTest extends TestCase
         return $response->baseResponse->original['access_token'];
     }
 
-    private function find_last() {
+    /*
+     * Find the last drummer added to the database.
+    */
+    public function find_last() : int
+    {
         $response = $this->get('/api/drummers');
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
+    }
+
+    /*
+     * Find the last component added to the database.
+    */
+    public function find_last_component() : int
+    {
+        $response = $this->get('/api/onderdelen');
+        return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
+    }
+
+    /*
+     * Find the last band added to the database.
+    */
+    public function find_last_band() : int
+    {
+        $response = $this->get('/api/bands');
         return $response->baseResponse->original[count($response->baseResponse->original) - 1]->id;
     }
 }

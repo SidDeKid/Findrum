@@ -64,17 +64,17 @@ class DrummerController extends Controller
     /**
      * Attach an existing drummer to an existing band.
      */
-    public function addToBand(Drummer $drummer, Band $band)
+    public function addBand(Drummer $drummer, Band $band)
     {
-        return $band->drummers()->associate($drummer);
+        return $band->drummers()->attach($drummer);
     }
 
     /**
      * remove an existing drummer from an existing band.
      */
-    public function removeFromBand(Drummer $drummer, Band $band)
+    public function removeBand(Drummer $drummer, Band $band)
     {
-        return $band->drummers()->dissociate($drummer);
+        return $band->drummers()->detach($drummer);
     }
 
     /**

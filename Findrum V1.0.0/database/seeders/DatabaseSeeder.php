@@ -12,10 +12,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            BandSeeder::class,
             BrandSeeder::class,
-            ComponentSeeder::class,
+            BandSeeder::class,
             DrummerSeeder::class, 
+            ComponentSeeder::class,
             Band_DrummerSeeder::class,
             Component_DrummerSeeder::class,
             UserSeeder::class,

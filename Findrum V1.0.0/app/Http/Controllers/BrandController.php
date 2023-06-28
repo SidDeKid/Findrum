@@ -56,14 +56,6 @@ class BrandController extends Controller
     {
         return $brand->components;
     }
-    
-    /**
-     * Remove an existing components from an existing brand.
-     */
-    public function removeComponents(Component $component, Brand $brand)
-    {
-        return $brand->brand()->dissociate($brand);
-    }
 
     /**
      * Update the specified resource in storage.

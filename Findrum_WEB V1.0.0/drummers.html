@@ -24,57 +24,75 @@
     </header>
 
     <main>
-        <div id="loginContainer">
-            <b>Inloggen</b> <br>
-            <form action="javascript:void(0);" v-bind:style="logInFormStyle">
-                <input v-model="user.email" type="email" placeholder="mail" id="mail">
-                <input v-model="user.password" type="password" placeholder="wachtwoord" id="wachtwoord">
-                <button type="submit" v-on:click="login()">Log in</button>
-            </form>
-        </div>
-        <div id="drummerCRUD">
+        <div id="primaryCRUD">
+            <input id="searchBar" v-model="strSearch" @input="index" type="text" placeholder="Zoeken...">
             <table>
                 <tr>
                     <th></th>
                     <th>Naam</th>
                 </tr>
                 <tr v-for="drummer in drummers">
-                    <td class="selectButton" v-on:click="select(drummer, this)">Selecteer</td>
+                    <td class="selectButton" v-on:click="select(drummer)" onclick="select(this)">Selecteer</td>
                     <td>{{drummer.first_name}} {{drummer.last_name}}</td>
                     <td v-on:click="deleteDrummer(drummer)" v-bind:style="deleteButtonStyle"> x </td>
                 </tr>
             </table>
-            <div id="createForm" v-bind:style="userFormStyle">
+            <div id="createForm" v-bind:style="formStyle">
                 <b>Toevoegen</b> <br>
-                <label>Voornaam:</label><input v-model="newDrummer.first_name" type="text" id="first_name" /><br />
-                <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name" />
-                <button v-on:click="addDrummer()">Toevoegen</button>
+                <form action="javascript:void(0);">
+                    <label>Voornaam:</label><input v-model="newDrummer.first_name" type="text" id="first_name" placeholder="Harrie..." maxlength="75" required/> <br>
+                    <label>Achternaam:</label><input v-model="newDrummer.last_name" type="text" id="last_name" placeholder="Drummer..." maxlength="75" required/>
+                    <button v-on:click="addDrummer">Toevoegen</button>
+                </form>
             </div>
-            <div id="updateForm" v-bind:style="userFormStyle">
+            <div id="updateForm" v-bind:style="secondaryFormStyle">
                 <b>Wijziggen</b> <br>
-                <label>Voornaam:</label><input v-model="selectedDrummer.first_name" type="text" id="first_nameEdit" /><br />
-                <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit" />
-                <button v-on:click="editDrummer()">Wijziggen</button>
+                <form action="javascript:void(0);">
+                    <label>Voornaam:</label><input v-model="selectedDrummer.first_name" type="text" id="first_nameEdit" placeholder="Harrie..." maxlength="75" required/> <br>
+                    <label>Achternaam:</label><input v-model="selectedDrummer.last_name" type="text" id="last_nameEdit" placeholder="Drummer..." maxlength="75" required/>
+                    <button v-on:click="editDrummer">Wijziggen</button>
+                </form>
             </div>
+            <div id="loginContainer" v-bind:style="loginFormStyle">
+                <b>Inloggen</b> <br>
+                <form action="javascript:void(0);">
+                    <input v-model="user.email" type="email" placeholder="mail" id="mail">
+                    <input v-model="user.password" type="password" placeholder="wachtwoord" id="wachtwoord">
+                    <button type="submit" v-on:click="login">Log in</button>
+                </form>
+            </div>    
         </div>
 
         <div id="line"></div>
 
-        <div id="componentCRUD">
+        <div id="secondaryCRUD">
+            <div>
+                <strong>Geselecteerd</strong> <br>
+                <span v-html="selectedDrummer.first_name"></span>&nbsp;<span v-html="selectedDrummer.last_name"></span> <br> <br>
+            </div>
             <table>
                 <tr>
                     <th>Naam</th>
                     <th>Merk</th>
                     <th>Diameter</th>
                 </tr>
-                <tbody id="indexComponents" />
+                <tr v-for="component in components">
+                    <td>{{component.name}}</td>
+                    <td>{{component.brand.name}}</td>
+                    <td>{{component.diameter}}</td>
+                    <td v-on:click="deleteComponent(component.id)" v-bind:style="deleteButtonStyle"> x </td>
+                </tr>
             </table>
-            <div id="createComponentForm" v-bind:style="userFormStyle">
+            <div id="createComponentForm" v-bind:style="secondaryFormStyle">
                 <b>Toevoegen</b> <br>
-                <label>Naam:</label><input type="text" id="name" required /><br />
-                <label>Diameter:</label><input type="number" id="diameter" required /><br />
-                <label>Merk:</label><select id="brand_id" required></select>
-                <button onclick="addComponent()">Toevoegen</button>
+                <form action="javascript:void(0);">
+                    <label>Naam:</label><input type="text" id="name" v-model="newComponent.name" placeholder="High-hat..." maxlength="100" required /><br />
+                    <label>Diameter:</label><input type="number" id="diameter" v-model="newComponent.diameter" required /><br />
+                    <label>Merk:</label><select id="brands" v-model="newComponent.brand" required>
+                        <option v-for="brand in DBbrands" :value="brand">{{brand.name}}</option>
+                    </select>
+                    <button v-on:click="addComponent()">Toevoegen</button>
+                </form>
             </div>
         </div>
     </main>

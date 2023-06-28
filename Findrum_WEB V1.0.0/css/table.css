@@ -1,5 +1,6 @@
 table {
     align-self: flex-start;
+    border-collapse: collapse;
     max-height: 500px;
 }
 th, td {
@@ -14,7 +15,6 @@ td:last-child {
 
 .selectButton {
     color: blue;
-    text-decoration: underline;
     width: 65px;
 }
 .selectButton:hover {
@@ -23,4 +23,5 @@ td:last-child {
 }
 .selected {
     color: green;
+    text-decoration: underline;
 }

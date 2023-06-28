@@ -1,416 +1,489 @@
 "use strict"
+
 const apiBasis = "http://127.0.0.1:8000/api/"
-const addDrummers = "drummers/"
-const addComponents = "onderdelen/"
-const addBrands = "merken/"
-const addBrand = "merk/"
+const routeDrummers = "drummers/"
+const routeComponents = "onderdelen/"
+const routeBrands = "merken/"
 
 const apiLogin = apiBasis + "login"
 const apiRegister = apiBasis + "register"
 
-var loggedIn = false
-var access_token = undefined
-
-const loadBrands = async () => {
-    console.log('Loading brands...')
-    try {
-        const response = await axios.get(apiBasis + addBrands)
-        const json = await response.data
-        let brands
-        json.map(el => {
-            brands[el.id] = el.name
-            selectBrand += `<option value="${el.id}">${el.name}</option>`
-        })
-        console.log(json.length + " brands loaded.")
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    }
-}
-
-const loadDrummers = async () => {
-    console.log('Loading drummers...')
-    try {
-        const response = await axios.get(apiBasis + addDrummers)
-        const drummers = await response.data
-        console.log(drummers.length + " drummers loaded.")
-        return drummers
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    }
-    return []
-}
-
-const loadComponents = async () => {
-    console.log('Loading components...')
-    try {
-        if (selectedDrummer == 0) {
-            console.log("0 components loaded, no drummer selected.")
-            components = []
-            return
-        }
-
-        const response = await axios.get(apiBasis + addDrummers + `${selectedDrummer}/` + addComponents)
-        const json = await response.data
-        components = []
-        json.map(el => {
-            components[el.id] = el
-        })
-        console.log(json.length + " components loaded.")
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    } 
-}
-
-const showDrummers = () => {
-    console.log("Showing drummers...")
-    let tabelInhoud = ''
-    if (loggedIn) {
-        drummers.map(el => tabelInhoud += `<tr><td class="selectButton" onclick="select(${el.id}, '${el.first_name}', '${el.last_name}', this)">Selecteer</td>
-            <td>${el.first_name} ${el.last_name}</td><td onclick="deleteDrummer(${el.id})"> x </td></tr>`)
-    }
-    else {
-        drummers.map(el => tabelInhoud += `<tr><td class="selectButton" onclick="select(${el.id}, '${el.first_name}', '${el.last_name}', this)">Selecteer</td>
-            <td>${el.first_name} ${el.last_name}</td><td onclick="deleteDrummer(${el.id})" style="display: none;"> x </td></tr>`)
-    }
-    if (tabelInhoud == '') {
-        tabelInhoud = "Er zijn geen drummers gevonden."
-        console.log("No drummers found.")
-    }
-    else {
-        console.log("Succes.")
-    }
-    document.getElementById("indexDrummers").innerHTML = tabelInhoud
-}
-
-const showComponents = async () => {
-    console.log("Showing components...")
-    let tabelInhoud = ''
-    if (loggedIn) {
-        components.map(el => tabelInhoud += `<tr><td>${el.name}</td><td>${brands[el.brand_id]}</td>
-            <td>${el.diameter}</td><td onclick="deleteComponent(${el.id})""> x </td></tr>`)
-    }
-    else {
-        components.map(el => tabelInhoud += `<tr><td>${el.name}</td><td>${brands[el.brand_id]}</td>
-            <td>${el.diameter}</td><td onclick="deleteComponent(${el.id})" style="display: none;"> x </td></tr>`)
-    }
-    if (tabelInhoud == '') {
-        tabelInhoud = "Er zijn geen onderdelen gevonden."
-        console.log("No components found.")
-    }
-    else {
-        console.log("Succes.")
-    }
-    document.getElementById("indexComponents").innerHTML = tabelInhoud
-}
-
-const login = async (user) => {
-    const email    = user.email
-    const password = user.password
-    const jsonstring = {"password":password, "email":email}
-    console.log("login: ", email)
-    const respons = await axios.post(apiLogin, jsonstring, {headers: {'Content-Type': 'application/json'}})
-    console.log('status code', respons.status)
-    access_token = await respons.data.access_token
-    console.log('access_token: ', access_token)
-    
-    loggedIn = true
-}		
-
-const select = async (id, firstName, lastName, button) => {
-    console.log(`Selecting drummer ${id}...`)
-    selectedDrummer = id
-
-    document.querySelectorAll(".selectButton").forEach(selectButton => {
-        selectButton.className = "selectButton"
-    })
-    button.className += " selected"
-
-    if (loggedIn) {
-        document.getElementById("updateForm").style.display = "initial"
-        document.getElementById("createComponentForm").style.display = "initial"
-        document.getElementById("first_nameEdit").value = firstName
-        document.getElementById("last_nameEdit").value = lastName
-    }
-
-    console.log(`Succes.`)
-    await loadComponents()
-    showComponents()
-}
-
-const deSelect = async () => {
-    console.log(`Deselecting all drummers...`)
-
-    selectedDrummer = 0
-
-    document.querySelectorAll(".selectButton").forEach(selectButton => {
-        selectButton.className = "selectButton"
-    });
-
-    document.getElementById("updateForm").style.display = "none"
-    document.getElementById("createComponentForm").style.display = "none"
-
-    console.log('Succes.')
-    await loadComponents()
-    showComponents()
-}
-
-const addDrummer = async () => {
-    try {
-        const firstName = document.getElementById("first_name").value
-        const lastName = document.getElementById("last_name").value
-        const jsonstring = { "first_name": firstName, "last_name": lastName }
-        console.log("Adding drummer...", jsonstring)
-        const response = await axios.post(apiBasis + addDrummers, jsonstring, { 
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ access_token 
-            } 
-        })
-        if (response.status == 201) {
-            console.log("Succes.")
-        }
-        else {
-            console.log('Unexpected result, status code: ', response.status)
-        }
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    } finally {
-        await loadDrummers()
-        showDrummers()
-    }
-}
-
-const addComponent = async () => {
-    if (selectedDrummer == 0) {
-        console.log("Failed, no drummer selected")
-        return
-    }
-    try {
-        const name = document.getElementById("name").value
-        const diameter = parseFloat(document.getElementById("diameter").value)
-        const brand = parseInt(document.getElementById("brand_id").value)
-        const drummer = selectedDrummer
-        const jsonstring = { "name": name, "diameter": diameter, "brand_id": brand, "drummer_id": drummer }
-        console.log("Adding component...", jsonstring)
-        const response = await axios.post(apiBasis + addComponents, jsonstring, { 
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ access_token 
-            } 
-        })
-        if (response.status == 201) {
-            console.log("Succes.")
-        }
-        else {
-            console.log('Unexpected result, status code: ', response.status)
-        }
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    } finally {
-        await loadDrummers()
-        await loadComponents()
-        await showComponents()
-        showDrummers()
-    }
-}
-
-const deleteDrummer = async (id) => {
-    try {
-        console.log(`Deleting drummer ${id}...`)
-        const response = await axios.delete(apiBasis + addDrummers + id, { 
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ access_token 
-            } 
-        })
-        if (response.status == 200) {
-            console.log("Succes.")
-        }
-        else {
-            console.log('Unexpected result, status code: ', response.status)
-        }
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    } finally {
-        await deSelect()
-        await loadDrummers()
-        await showComponents()
-        showDrummers()
-    }
-}
-
 const deleteComponent = async (id) => {
     try {
         console.log(`Deleting component ${id}...`)
-        const response = await axios.delete(apiBasis + addComponents + id, { 
+        const response = await axios.delete(apiBasis + routeComponents + id, { 
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization':'Bearer '+ access_token 
+                'Authorization':'Bearer '+ accessToken 
             } 
         })
         if (response.status == 200) {
-            console.log("Succes.")
+            return true
         }
         else {
             console.log('Unexpected result, status code: ', response.status)
+            return false
         }
     } catch (error) {
         console.log("Unexpected result.", error)
-    } finally {
-        await loadComponents()
-        showComponents()
-    }
+        return false
+    } 
 }
 
-const editDrummer = async () => {
-    try {
-        const first_name = document.getElementById("first_nameEdit").value
-        const last_name = document.getElementById("last_nameEdit").value
-        const jsonstring = { "first_name": first_name, "last_name": last_name }
-        console.log(`Changing drummer ${selectedDrummer} To...`, jsonstring)
-        const response = await axios.patch(apiBasis + addDrummers + selectedDrummer, jsonstring, { 
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ access_token 
-            } 
+/**
+ * Changes the style of a selected button.
+ * @param {Element} button 
+ * @returns {void}
+ */
+const select = (button) => {
+    if (button != null && button != undefined) {
+        document.querySelectorAll(".selectButton").forEach(selectButton => {
+            selectButton.className = "selectButton"
         })
-        if (response.status == 200) {
-            console.log("Succes.")
-        }
-        else {
-            console.log('Unexpected result, status code: ', response.status)
-        }
-    } catch (error) {
-        console.log("Unexpected result.", error)
-    } finally {
-        await loadDrummers()
-        showDrummers()
+        button.className += " selected"
     }
 }
 
-const app = Vue.createApp({                                     // vue-instantie
-    data(){                                                     // properties
+const app = Vue.createApp({
+    data(){
         return{
-            selectedDrummer: {"id": 0, "first-name": "", "lastname": ""},
-            newDrummer: {"id": 0, "first-name": "", "lastname": ""},
-        
-            DBdrummers: loadDrummers(),
-            DBcomponents: loadComponents(),
-            DBbrands: loadBrands(),
+            // Properties
+            user: {email: "root@development.com", password: "-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8"},
+            accessToken: undefined,
+            selectedDrummer: {"id": 0, "first_name": "", "last_name": ""},
+            newDrummer: {"id": 0, "first_name": "", "last_name": ""},
+            newComponent: {"name": "", "diameter": 0, "brand": undefined},
+            strSearch: "",
 
-            drummers: this.DBdrummers,
+            // Requirements for validation
+            requirementsDrummer: {
+                "first_name_nullable":  false, "first_name_max_char":   75,
+                "last_name_nullable":   false, "last_name_max_char":    75
+            },
+            requirementsComponent: {
+                "name_nullable":        false, "name_max_char": 100,
+                "diameter_nullable":    false,
+                "brand_id_nullable":    false
+            },
+        
+            // Database values
+            DBdrummers: [],
+            DBbrands: [],
+
+            // Visable values
+            drummers: [],
             components: [],
 
-            search: "",
-            user: {email: "root@development.com", password: "-2c@BPJ8:WmFfSk5JF+$(/R5e-GEfph,cVWjM8X8"},
-
+            // Styles
             formStyle: {display: "none"},
             loginFormStyle: {display: "inline"},
             secondaryFormStyle: {display: "none"},
+            deleteButtonStyle: {display: "none"},
         }
     },
-    methods:{                                                   // methods
-        loadDrummers() {
+    methods:{
+        /**
+         * Collects all objects from the database that are usefull or necessary at the beginning.
+         * @returns {void}
+         */
+        async load() {
+            let DBbrands = this.DBbrands
             let DBdrummers = this.DBdrummers
-
-            DBdrummers = loadDrummers()
-
-            this.DBdrummers = DBdrummers
-
-            this.searchDrummers()
-        },
-
-        loadComponents() {
-            const DBcomponents = this.DBcomponents
-            let components = this.components
-
-            DBcomponents.forEach(component => {components.add(component)})
-
-            this.components = components
-        },
-        
-        searchDrummers(){
-            const DBdrummers = this.DBdrummers
-            const search = this.search
             let drummers = this.drummers
 
-            if (search == "") {
+            try {
+                const responseDrummers = await axios.get(apiBasis + routeDrummers)
+
+                DBdrummers = await responseDrummers.data
+                drummers = DBdrummers
+
+                console.log(DBdrummers.length + " drummers loaded.")
+            } catch (error) {
+                DBdrummers = []
+                alert("Drummers konden niet geladen worden.")
+
+                console.log("0 drummers loaded, because of caught error.", error)
+            }
+
+            try {
+                const responseBrands = await axios.get(apiBasis + routeBrands)
+                DBbrands = await responseBrands.data
+        
+                console.log(DBbrands.length + " brands loaded.")
+            } catch (error) {
+                DBbrands = []
+                alert("Merken konden niet geladen worden.")
+
+                console.log("0 brands loaded, because of caught error.", error)
+            }
+
+            this.DBbrands = DBbrands
+            this.DBdrummers = DBdrummers
+            this.drummers = drummers
+        },
+        
+        /**
+         * Collects all the objects linked to the selected object form the database.
+         * @returns {void}
+         */
+        async loadComponents() {
+            const selectedDrummer = this.selectedDrummer
+            let components = this.components
+
+            try {
+                if (selectedDrummer.id == 0) {
+                    components = []
+
+                    console.log("0 components loaded, because, no drummer selected.")
+                }
+                else {
+                    const response = await axios.get(apiBasis + routeDrummers + `${selectedDrummer.id}/` + routeComponents)
+                    components = await response.data
+                    
+                    console.log(components.length + " components loaded.")    
+                }
+            } catch (error) {
+                components = []
+                alert("Onderdelen konden niet geladen worden.")
+
+                console.log("0 components loaded, because of caught error.", error)
+            } 
+        
+            this.components = components
+        },
+
+        /**
+         * Adds an object to the database using the text from the create form, if the API allows it.
+         * @returns {void}
+         */
+        async addComponent() { // ------------------------------------- Link to drummer?
+            const accessToken = this.accessToken
+            let newComponent = this.newComponent
+
+            try {
+                if (this.validateComponent(newComponent)) {
+                    console.log("No component added, because of bad data. (Missing / Unusable)")
+                }
+                else {
+                    const jsonstring = { 
+                        "name": newComponent.name, 
+                        "diameter": newComponent.diameter, 
+                        "brand_id": newComponent.brand.id, 
+                    }
+                    const response = await axios.post(apiBasis + routeComponents, jsonstring, { 
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization':'Bearer '+ accessToken 
+                        } 
+                    })
+                    if (response.status == 201) {
+                        console.log("Component added.", newComponent)
+                        newComponent = {"name": "", "diameter": 0, "brand": undefined}
+                    }
+                    else {
+                        console.log('No component added, because of wrong status code.', response.status)
+                    }
+                }
+            } catch (error) {
+                console.log("No component added, because of caught error.", error)
+            } 
+
+            this.newComponent = newComponent
+            this.loadComponents()
+        },
+
+        /**
+         * Adds an object to the database using the text from the create form, if the API allows it.
+         * @returns {void}
+         */
+        async addDrummer() {
+            const accessToken = this.accessToken
+            let DBdrummers = this.DBdrummers
+            let newDrummer = this.newDrummer
+
+            try {
+                if (this.validateDrummer(newDrummer)) {
+                    const jsonstring = { 
+                        "first_name": newDrummer.first_name, 
+                        "last_name": newDrummer.last_name 
+                    }
+                    const response = await axios.post(apiBasis + routeDrummers, jsonstring, { 
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization':'Bearer '+ accessToken 
+                        } 
+                    })
+                    if (response.status == 201) {
+                        const newResponse = await axios.get(apiBasis + routeDrummers)
+                        newDrummer = await newResponse.data.pop()
+
+                        DBdrummers.push(newDrummer)
+                        console.log(`Added drummer ${newDrummer.first_name} ${newDrummer.last_name}.`)
+
+                        newDrummer = {"id": 0, "first_name": "", "last_name": ""}
+                    }
+                    else {
+                        console.log('No drummer added, because of wrong status code: ', response.status)
+                    }
+                }
+                else {
+                    console.log("No drummer added, because of bad data. (Missing / Unusable)")
+                }
+            } catch (error) {
+                console.log("No drummer added, because of caught error.", error)
+            }
+
+            this.DBdrummers = DBdrummers
+            this.newDrummer = newDrummer
+            this.index()
+        },
+
+        /**
+         * Edits an object in the database using the text from the edit form, if the API allows it.
+         * @returns {void}
+         */
+        async editDrummer() {
+            const selectedDrummer = this.selectedDrummer
+            const accessToken = this.accessToken
+            let DBdrummers = this.DBdrummers
+
+            try {
+                if (!this.validateDrummer(selectedDrummer)) {
+                    console.log("No drummer updated, because of bad data. (Missing / Unusable)")
+                }
+                else {
+                    const jsonstring = { 
+                        "first_name": selectedDrummer.first_name, 
+                        "last_name": selectedDrummer.last_name 
+                    }
+                    const response = await axios.patch(apiBasis + routeDrummers + selectedDrummer.id, jsonstring, { 
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization':'Bearer '+ accessToken 
+                        } 
+                    })
+                    if (response.status == 200) {
+                        const index = DBdrummers.findIndex(DBdrummer => DBdrummer.id == selectedDrummer.id);
+                        DBdrummers[index] = selectedDrummer;
+                        console.log("Updated drummer.", selectedDrummer)
+                    }
+                    else {
+                        console.log('No drummer updated, because of wrong status code.', response.status)
+                    }
+                }
+            } catch (error) {
+                console.log("No drummer updated, because of caught error.", error)
+            }         
+
+            this.DBdrummers = DBdrummers
+            this.index()
+        },
+        
+        /**
+         * Deletes an object from the database, if the API allows it.
+         * @returns {void}
+         * @param {object} drummer 
+         */
+        async deleteDrummer(drummer) {
+            const accessToken = this.accessToken
+            let DBdrummers = this.DBdrummers
+
+            try {
+                const response = await axios.delete(apiBasis + routeDrummers + drummer.id, { 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization':'Bearer '+ accessToken 
+                    } 
+                })
+                if (response.status == 200) {
+                    DBdrummers = DBdrummers.filter(DBdrummer => DBdrummer !== drummer)
+                    console.log("Deleted drummer.", drummer)        
+                }
+                else {
+                    console.log('No drummer deleted, because of wrong status code.', response.status)
+                }
+            } catch (error) {
+                console.log("No drummer deleted, because of caught error.", error) 
+            }         
+
+            this.DBdrummers = DBdrummers   
+            this.deSelect()
+            this.index()
+        },
+
+        /**
+         * Logges in the user using the text from the log in form. 
+         * If log in is succesfull, this sets the access token, and showes the right forms.
+         * @returns {void}
+         */
+        async login() {
+            const user = this.user
+            const selectedDrummer = this.selectedDrummer
+            let accessToken = this.accessToken
+            let formStyle = this.formStyle
+            let secondaryFormStyle = this.secondaryFormStyle
+            let loginFormStyle = this.loginFormStyle
+            let deleteButtonStyle = this.deleteButtonStyle
+
+            const jsonstring = {"password": user.password, "email": user.email}
+        
+            try {
+                const response = await axios.post(apiLogin, jsonstring, {headers: {'Content-Type': 'application/json'}})
+
+                if (response.status == 200) {
+                    accessToken = await response.data.access_token
+                    console.log('Logged in. Access token: ', accessToken) 
+
+                    loginFormStyle = {display: "none"}
+                    formStyle = {display: "inline"}
+                    deleteButtonStyle = {display: "inline"}
+                    if (selectedDrummer.id != 0) {
+                        secondaryFormStyle = {display: "inline"}
+                    }
+                }
+                else {
+                    console.log("Unable to log in, because of wrong status code.", response.status)
+                }
+            } catch (error) {
+                console.log("Unable to log in, because of caught error.", error)
+            }
+
+            this.accessToken = accessToken
+            this.formStyle = formStyle
+            this.secondaryFormStyle = secondaryFormStyle
+            this.loginFormStyle = loginFormStyle
+            this.deleteButtonStyle = deleteButtonStyle
+        }, 
+
+        /**
+         * Fills the table with the right data using the text in the searchbar.
+         * @returns {void}
+         */
+        index(){
+            const strSearch = this.strSearch
+            let DBdrummers = this.DBdrummers
+            let drummers = this.drummers
+
+            if (strSearch == "") {
                 drummers = DBdrummers
             }
             else {
-                DBdrummers.forEach(drummer => {
-                    // let contains = false
-                    search.split(" ").forEach(searchWord => {
-                        if (drummer.firstName.includes(searchWord) || drummer.lastName.includes(searchWord)) {
-                            // contains = true
-                            drummers.add(drummer)
-                            return // Test.
+                drummers = []
+                strSearch.split(" ").forEach(searchWord => {
+                    DBdrummers.forEach(drummer => {
+                        if ((drummer.first_name.toLowerCase().includes(searchWord.toLowerCase()) 
+                            || drummer.last_name.toLowerCase().includes(searchWord.toLowerCase())) 
+                            && searchWord != "") {
+                            drummers.push(drummer)
+                            DBdrummers = DBdrummers.filter(arrDrummer => arrDrummer !== drummer)
+                            
+                            return
                         }
                     })
                 })
             }
             
-            console.log(drummers.length + "drummers found.")
+            console.log(drummers.length + " drummers found.")
             
+            // Do not set this.DBdrummers here.
             this.drummers = drummers
         },
 
-        select(drummer, button) {
+        /**
+         * Selects a certain row in the table.
+         * @returns {void}
+         * @param {object} drummer
+         */
+        select(drummer) {
+            const accessToken = this.accessToken
             let selectedDrummer = this.selectedDrummer
             let secondaryFormStyle = this.secondaryFormStyle
 
             selectedDrummer = drummer
             
-            document.querySelectorAll(".selectButton").forEach(selectButton => {
-                selectButton.className = "selectButton"
-            })
-            button.className += " selected"
-        
-            if (loggedIn) {
+            if (accessToken != undefined) {
                 secondaryFormStyle = {display: "initial"}
             }
 
             this.selectedDrummer = selectedDrummer
             this.secondaryFormStyle = secondaryFormStyle
-
             this.loadComponents()
         },
 
-        addDrummer() {
-            const newDrummer = this.newDrummer
-
-            addDrummer({"first_name": newDrummer.firstName, "last_name": newDrummer.lastName})
-        },
-
-        editDrummer() {
-            const selectedDrummer = this.selectedDrummer
-
-            editDrummer({"id": selectedDrummer.id, "first_name": selectedDrummer.firstName, "last_name": selectedDrummer.lastName})
-        },
-
-        login() {
-            const user = this.user
-            const selectedDrummer = this.selectedDrummer
+        /**
+         * Deselects all rows in the table.
+         * @returns {void}
+         */
+        deSelect() {
+            let selectedDrummer = this.selectedDrummer
             let secondaryFormStyle = this.secondaryFormStyle
-            let loginFormStyle = this.loginFormStyle
 
-            login(user)
-            if(loggedIn) {
-                formStyle = {display: "inline"}
-                if (selectedDrummer.id != 0) {
-                    secondaryFormStyle = {display: "inline"}
-                }    
-            }
+            selectedDrummer = {"id": 0, "first_name": "", "last_name": ""}
+            document.querySelectorAll(".selectButton").forEach(selectButton => {
+                selectButton.className = "selectButton"
+            })
 
+            secondaryFormStyle = {display: "none"}
+            
             this.secondaryFormStyle = secondaryFormStyle
-            this.loginFormStyle = loginFormStyle
+            this.selectedDrummer = selectedDrummer
+            this.loadComponents()
+        },
+
+        /**
+         * Validate if all the data of a drummer object is usable for the API. 
+         * Returns:
+         * - true, if data is usable.
+         * - false, if data is unusable. 
+         * @return {boolean}
+         * @param {object} drummer 
+         */ 
+        validateDrummer(drummer) {
+            const requirements = this.requirementsDrummer
+
+            try {
+                return (requirements.first_name_nullable || (drummer.first_name != undefined && drummer.first_name != "" && drummer.first_name != null)) &&
+                    drummer.first_name.length <= requirements.first_name_max_char &&
+                    (requirements.last_name_nullable || (drummer.last_name != undefined && drummer.last_name != "" && drummer.last_name != null)) &&
+                    drummer.last_name.length <= requirements.last_name_max_char
+                } catch (error) {
+                console.log("Caught error while validating drummer.", error)
+                return false
+            }
+        },
+
+        /**
+         * Validate if all the data of a component object is usable for the API. 
+         * Returns:
+         * - true, if data is usable.
+         * - false, if data is unusable. 
+         * @return {boolean}
+         * @param {object} component 
+        **/ 
+        validateComponent(component) {
+            const requirements = this.requirementsComponent
+
+            try {
+                return (requirements.name_nullable || (component.name != undefined && component.name != "" && component.name != null)) &&
+                component.name.length <= requirements.name_max_char &&
+                (requirements.diameter_nullable || (component.diameter != undefined && component.diameter != null && component.diameter != "" &&
+                !isNaN(component.diameter) && parseInt(Number(component.diameter)) == component.diameter && !isNaN(parseInt(component.diameter, 10)))) &&
+                (requirements.brand_id_nullable || (component.brand.id != undefined && component.brand.id != "" && component.brand.id != null &&
+                brand_id >= 1))
+            } catch (error) {
+                console.log("Caught error while validating component.", error)
+                return false
+            }
         }
+    },
+    created: function() {
+        this.load()
     }
 })
 
-app.mount('main')                                               // binding aan html-element
+app.mount('main')

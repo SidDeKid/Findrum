@@ -44,34 +44,19 @@ div {
 }
 
 div, footer {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 #createForm, #updateForm, #createComponentForm {
     display: none;
 }
-#drummerCRUD {
+#primaryCRUD {
     grid-column: 1/2;
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
-}
-#line {
-    grid-column: 2/3;
-    grid-row: 1/4;
-    background-color: gray;
-    width: 1px;
-}
-#componentCRUD {
-    grid-column: 3/4;
-    display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto 1fr auto auto;
 }
 
 @media screen and (max-width: 931px) {
-    main {
-        grid-template-columns: auto;
-        grid-template-rows: auto 50px auto;
-    }
     table {
         grid-row: inherit;
     }
@@ -82,14 +67,4 @@ div, footer {
     .selectButton {
         width: 85px;
     }    
-
-    #line {
-        grid-column: 1/2;
-        grid-row: 2/3;
-        height: 1px;
-        width: 100%;
-    }
-    #componentCRUD {
-        grid-column: 1/2;
-    }
 }
